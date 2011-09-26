@@ -13,7 +13,7 @@ namespace Restack\Queue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class WeightQueue extends PriorityQueue
+class Weight extends PriorityQueue
 {
     /**
      * Add an element to the stack
@@ -47,7 +47,7 @@ class WeightQueue extends PriorityQueue
      * @param mixed $item
      * @param integer $weight
      * @throws Restack\Queue\Exception\InvalidItemException
-     * @return Restack\Queue\WeightQueue
+     * @return Restack\Queue\Weight
      */
     public function setOrder($item, $weight)
     {
