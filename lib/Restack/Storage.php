@@ -3,10 +3,12 @@
 namespace Restack;
 
 /**
+ * Typical item storage interface
+ * 
  * @category  Restack
  * @package   Restack\Storage
  */
-interface Storage
+interface Storage extends \Countable, \IteratorAggregate
 {
     /**
      * Clear storage

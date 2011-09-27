@@ -17,7 +17,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority implements Storage, \Countable, \IteratorAggregate
+class Priority implements Storage
 {
     const DEFAULT_ORDER = 1;
     
