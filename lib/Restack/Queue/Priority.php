@@ -2,6 +2,7 @@
 
 namespace Restack\Queue;
 
+use Restack\Datastructure;
 use Restack\Queue\Exception\InvalidItemException;
 use SplPriorityQueue;
 
@@ -16,7 +17,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority implements \Countable, \IteratorAggregate
+class Priority implements Datastructure, \Countable, \IteratorAggregate
 {
     const DEFAULT_ORDER = 1;
     
