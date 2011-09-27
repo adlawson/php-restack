@@ -13,7 +13,7 @@ namespace Restack\Queue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Weight extends PriorityQueue
+class Weight extends Priority
 {
     /**
      * Add an element to the stack

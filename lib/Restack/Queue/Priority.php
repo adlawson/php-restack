@@ -16,7 +16,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class PriorityQueue implements StorageInterface, \IteratorAggregate
+class Priority implements \Countable, \IteratorAggregate
 {
     const DEFAULT_ORDER = 1;
     
@@ -94,7 +94,7 @@ class PriorityQueue implements StorageInterface, \IteratorAggregate
     /**
      * Remove an element from the stack
      * 
-     * To remove an item from SplPriorityStack, we have
+     * To remove an item from SplPriorityQueueStack, we have
      * a simplified copy stored in an array. We simply
      * remove from the array and rebuild the queue.
      * 
@@ -181,7 +181,7 @@ class PriorityQueue implements StorageInterface, \IteratorAggregate
      * @param mixed $item
      * @param integer $priority
      * @throws Restack\Queue\Exception\InvalidItemException
-     * @return Restack\Queue\PriorityQueue
+     * @return Restack\Queue\Priority
      */
     public function setOrder($item, $priority)
     {

@@ -2,7 +2,7 @@
 
 namespace Restack\Queue\Exception;
 
-use Restack\Queue\Exception;
+use Restack\Exception;
 
 /**
  * @category  Restack
