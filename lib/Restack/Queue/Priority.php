@@ -2,7 +2,7 @@
 
 namespace Restack\Queue;
 
-use Restack\Datastructure;
+use Restack\Storage;
 use Restack\Queue\Exception\InvalidItemException;
 use SplPriorityQueue;
 
@@ -17,7 +17,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority implements Datastructure, \Countable, \IteratorAggregate
+class Priority implements Storage, \Countable, \IteratorAggregate
 {
     const DEFAULT_ORDER = 1;
     
@@ -95,7 +95,7 @@ class Priority implements Datastructure, \Countable, \IteratorAggregate
     /**
      * Remove an element from the stack
      * 
-     * To remove an item from SplPriorityQueueStack, we have
+     * To remove an item from SplPriorityQueue, we have
      * a simplified copy stored in an array. We simply
      * remove from the array and rebuild the queue.
      * 

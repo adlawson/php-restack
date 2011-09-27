@@ -4,9 +4,9 @@ namespace Restack;
 
 /**
  * @category  Restack
- * @package   Restack\Datastructure
+ * @package   Restack\Storage
  */
-interface Datastructure
+interface Storage
 {
     /**
      * Clear storage
