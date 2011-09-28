@@ -28,7 +28,7 @@ class Priority implements Storage
     protected $index = PHP_INT_MAX;
     
     /**
-     * An array of queued items
+     * A temp storage of items to queue
      * @var array
      */
     protected $items = array();
@@ -40,11 +40,12 @@ class Priority implements Storage
     protected $queue;
     
     /**
-     * Clear the queue
+     * Clear the queue and reset internal values
      * @return void
      */
     public function clear()
     {
+        $this->index = PHP_INT_MAX;
         $this->items = array();
         $this->queue = null;
     }
@@ -65,7 +66,7 @@ class Priority implements Storage
      */
     public function exists($item)
     {
-        foreach ($this->items as $key => $value) {
+        foreach ($this->items as $value) {
             if ($value['data'] === $item) {
                 return true;
             }
@@ -75,7 +76,7 @@ class Priority implements Storage
     }
     
     /**
-     * Add an element to the stack
+     * Add an element to the queue
      * @param mixed $item
      * @param integer $priority
      * @return void
@@ -84,21 +85,16 @@ class Priority implements Storage
     {
         $priority = array($priority, $this->index--);
         
+        $this->queue = null;
+        
         $this->items[] = array(
             'data'     => $item,
             'priority' => $priority
         );
-        
-        $this->getQueue()->insert($item, $priority);
     }
     
     /**
-     * Remove an element from the stack
-     * 
-     * To remove an item from SplPriorityQueue, we have
-     * a simplified copy stored in an array. We simply
-     * remove from the array and rebuild the queue.
-     * 
+     * Remove an element from the queue
      * @param mixed $item
      * @return boolean
      */
@@ -115,11 +111,6 @@ class Priority implements Storage
         if ($exists) {
             unset($this->items[$key]);
             $this->queue = null;
-            $queue = $this->getQueue();
-            
-            foreach ($this->items as $value) {
-                $queue->insert($value['data'], $value['priority']);
-            }
             
             return true;
         }
@@ -135,26 +126,22 @@ class Priority implements Storage
     {
         if (null === $this->queue) {
             $this->queue = new SplPriorityQueue;
+            
+            foreach ($this->items as $item) {
+                $this->queue->insert($item['data'], $item['priority']);
+            }
         }
         
         return $this->queue;
     }
     
     /**
-     * Get the queue iterator
-     * @param boolean $persist
+     * Get a cloned queue instance for iterating
      * @return SplPriorityQueue
      */
-    public function getIterator($persist = true)
+    public function getIterator()
     {
-        $queue = $this->getQueue();
-
-        if ($persist && $queue->count()) {
-            return clone $queue;
-        }
-        
-        $this->items = array();
-        return $queue;
+        return clone $this->getQueue();
     }
     
     /**

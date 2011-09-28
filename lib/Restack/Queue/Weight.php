@@ -16,7 +16,7 @@ namespace Restack\Queue;
 class Weight extends Priority
 {
     /**
-     * Add an element to the stack
+     * Add an element to the queue
      * @param mixed $item
      * @param integer $weight
      * @return void
