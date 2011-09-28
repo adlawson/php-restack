@@ -3,7 +3,7 @@
 namespace Restack\Queue;
 
 use Restack\Storage;
-use Restack\Queue\Exception\InvalidItemException;
+use Restack\InvalidItemException;
 use SplPriorityQueue;
 
 /**
@@ -164,12 +164,13 @@ class Priority implements Storage
      * 
      * @param mixed $item
      * @param integer $priority
-     * @throws Restack\Queue\Exception\InvalidItemException
+     * @throws Restack\InvalidItemException
      * @return Restack\Queue\Priority
      */
     public function setOrder($item, $priority)
     {
-        if ($this->remove($item)) {
+        if ($this->exists($item)) {
+            $this->remove($item);
             $this->insert($item, $priority);
             return $this;
         }

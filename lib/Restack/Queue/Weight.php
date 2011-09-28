@@ -46,7 +46,7 @@ class Weight extends Priority
      * 
      * @param mixed $item
      * @param integer $weight
-     * @throws Restack\Queue\Exception\InvalidItemException
+     * @throws Restack\InvalidItemException
      * @return Restack\Queue\Weight
      */
     public function setOrder($item, $weight)

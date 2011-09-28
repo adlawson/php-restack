@@ -3,7 +3,7 @@
 namespace Restack\Test\Queue;
 
 use Restack\Queue\Weight;
-use Restack\Queue\Exception\InvalidItemException;
+use Restack\InvalidItemException;
 
 class WeightTest extends \PHPUnit_Framework_TestCase
 {
@@ -81,6 +81,6 @@ class WeightTest extends \PHPUnit_Framework_TestCase
             return;
         }
         
-        $this->fail('Exception Restack\Queue\Exception\InvalidItemException expected but not thrown');
+        $this->fail('Exception Restack\InvalidItemException expected but not thrown');
     }
 }

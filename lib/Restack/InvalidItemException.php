@@ -1,12 +1,10 @@
 <?php
 
-namespace Restack\Queue\Exception;
-
-use Restack\Exception;
+namespace Restack;
 
 /**
  * @category  Restack
- * @package   Restack\Queue
+ * @package   Restack\Exception
  */
 class InvalidItemException extends \InvalidArgumentException implements Exception
 {
