@@ -96,7 +96,7 @@ class Priority implements Storage
     /**
      * Remove an element from the queue
      * @param mixed $item
-     * @return boolean
+     * @return void
      */
     public function remove($item)
     {
@@ -111,11 +111,7 @@ class Priority implements Storage
         if ($exists) {
             unset($this->items[$key]);
             $this->queue = null;
-            
-            return true;
         }
-        
-        return false;
     }
     
     /**
