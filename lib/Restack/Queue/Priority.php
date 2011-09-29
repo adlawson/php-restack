@@ -133,11 +133,16 @@ class Priority implements Storage
     
     /**
      * Get a cloned queue instance for iterating
+     * @param boolean $persist
      * @return SplPriorityQueue
      */
-    public function getIterator()
+    public function getIterator($persist = true)
     {
-        return clone $this->getQueue();
+        if ($persist) {
+            return clone $this->getQueue();
+        }
+        
+        return $this->getQueue();
     }
     
     /**
