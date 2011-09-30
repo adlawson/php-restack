@@ -23,12 +23,6 @@ class Priority implements Storage
     const DEFAULT_ORDER = 1;
     
     /**
-     * Dependency map
-     * @var array
-     */
-    protected $dependencies;
-    
-    /**
      * Item index for normalising order
      * @var integer
      */
@@ -218,9 +212,9 @@ class Priority implements Storage
             }
         }
         
-        if (!exists) {
+        if (!$exists) {
             throw new InvalidItemException('Can\'t add a dependency listener to a non-existent target');
-        } elseif (!in_array($item, $value['listeners'])) {
+        } elseif (!in_array($item, $this->items[$key]['listeners'])) {
             $this->items[$key]['listeners'][] = $item;
         }
     }
