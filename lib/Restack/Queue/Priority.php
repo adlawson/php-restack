@@ -197,7 +197,7 @@ class Priority implements Storage
     public function addDependency($target, $item)
     {
         if (!$this->exists($item)) {
-            throw new InvalidItemException('Can\'t track a dependency for a non-existent item');
+            throw new InvalidItemException('Can\'t track a dependency of a non-existent item');
         }
         
         $exists = false;
