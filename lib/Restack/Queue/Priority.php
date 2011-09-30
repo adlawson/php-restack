@@ -2,8 +2,9 @@
 
 namespace Restack\Queue;
 
+use Restack\Exception\CircularDependencyException;
+use Restack\Exception\InvalidItemException;
 use Restack\Storage;
-use Restack\InvalidItemException;
 use SplPriorityQueue;
 
 /**
@@ -20,6 +21,12 @@ use SplPriorityQueue;
 class Priority implements Storage
 {
     const DEFAULT_ORDER = 1;
+    
+    /**
+     * Dependency map
+     * @var array
+     */
+    protected $dependencies;
     
     /**
      * Item index for normalising order
@@ -88,8 +95,9 @@ class Priority implements Storage
         $this->queue = null;
         
         $this->items[] = array(
-            'data'     => $item,
-            'priority' => $priority
+            'data'      => $item,
+            'listeners' => array(),
+            'priority'  => $priority
         );
     }
     
@@ -169,7 +177,7 @@ class Priority implements Storage
      * 
      * @param mixed $item
      * @param integer $priority
-     * @throws Restack\InvalidItemException
+     * @throws Restack\Exception\InvalidItemException
      * @return Restack\Queue\Priority
      */
     public function setOrder($item, $priority)
@@ -181,5 +189,39 @@ class Priority implements Storage
         }
         
         throw new InvalidItemException('Can\'t set priority on a non-existent item');
+    }
+    
+    /**
+     * Add an item dependency
+     * @param mixed $target
+     * @param mixed $item
+     * @throws Restack\Exception\InvalidItemException
+     * @throws Restack\Exception\CircularDependencyException
+     * @throws Restack\Exception\InvalidItemException
+     * @return void
+     */
+    public function addDependency($target, $item)
+    {
+        if (!$this->exists($item)) {
+            throw new InvalidItemException('Can\'t track a dependency for a non-existent item');
+        }
+        
+        $exists = false;
+        foreach ($this->items as $key => $value) {
+            if ($value['data'] === $item && in_array($target, $value['listeners'])) {
+                throw new CircularDependencyException('Can\'t create circular or recursive dependencies');
+            }
+            
+            if ($value['data'] === $target) {
+                $exists = true;
+                break;
+            }
+        }
+        
+        if (!exists) {
+            throw new InvalidItemException('Can\'t add a dependency listener to a non-existent target');
+        } elseif (!in_array($item, $value['listeners'])) {
+            $this->items[$key]['listeners'][] = $item;
+        }
     }
 }
