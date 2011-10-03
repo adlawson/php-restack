@@ -10,28 +10,38 @@ class DependencyArray extends \ArrayObject
     
     public function __construct( )
     {
-        $this->stack = new DependencyStack;
+        $this->setStack( new DependencyStack );
     }
     
     public function offsetSet( $offset, $value )
     {
-        $this->stack->insert( $offset );
-        return parent::offsetSet( $offset, $value );
+        parent::offsetSet( $offset, $value );
+        $this->getStack()->insert( $offset );
     }
 
     public function offsetUnset( $offset )
     {
-        $this->stack->remove( $offset );
-        return parent::offsetUnset( $offset );
+        parent::offsetUnset( $offset );
+        $this->getStack()->remove( $offset );
     }
     
     public function dependency( $parent, $child )
     {
-        return $this->stack->dependency( $parent, $child );
+        return $this->getStack()->dependency( $parent, $child );
     }
     
     public function toArray()
     {
-        return array_combine( $this->stack->retrieve(), (array) $this );
+        return array_combine( $this->getStack()->retrieve(), (array) $this );
+    }
+    
+    public function getStack()
+    {
+        return $this->stack;
+    }
+
+    public function setStack( $stack )
+    {
+        $this->stack = $stack;
     }
 }
