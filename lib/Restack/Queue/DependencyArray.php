@@ -6,6 +6,7 @@ use Restack\Queue\DependencyStack;
 
 class DependencyArray extends \ArrayObject
 {
+    /** @var DependencyStack */
     private $stack;
     
     public function __construct( )
@@ -27,7 +28,7 @@ class DependencyArray extends \ArrayObject
     
     public function dependency( $parent, $child )
     {
-        return $this->getStack()->dependency( $parent, $child );
+        $this->getStack()->dependency( $parent, $child );
     }
     
     public function toArray()
@@ -35,12 +36,13 @@ class DependencyArray extends \ArrayObject
         return array_combine( $this->getStack()->retrieve(), (array) $this );
     }
     
+    /** @return DependencyStack */
     public function getStack()
     {
         return $this->stack;
     }
 
-    public function setStack( $stack )
+    public function setStack( DependencyStack $stack )
     {
         $this->stack = $stack;
     }
