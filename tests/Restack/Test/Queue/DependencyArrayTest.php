@@ -2,9 +2,9 @@
 
 namespace Restack\Test\Queue;
 
-use Restack\Queue\DependencyQueue;
+use Restack\Queue\DependencyArray;
 
-class DependencyQueueTest extends \PHPUnit_Framework_TestCase
+class DependencyArrayTest extends \PHPUnit_Framework_TestCase
 {
     private $queue;
     
@@ -14,7 +14,7 @@ class DependencyQueueTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->queue = new DependencyQueue;
+        $this->queue = new DependencyArray;
     }
     
     public function testInsert()

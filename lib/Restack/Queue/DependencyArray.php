@@ -3,9 +3,8 @@
 namespace Restack\Queue;
 
 use Restack\Queue\DependencyStack;
-use Insomnia\Pattern\ArrayAccess;
 
-class DependencyQueue extends ArrayAccess
+class DependencyArray extends \ArrayObject
 {
     private $stack;
     
@@ -33,6 +32,6 @@ class DependencyQueue extends ArrayAccess
     
     public function toArray()
     {
-        return array_combine( $this->stack->retrieve(), $this->data );
+        return array_combine( $this->stack->retrieve(), (array) $this );
     }
 }
