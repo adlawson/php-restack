@@ -2,7 +2,7 @@
 
 namespace Restack\Test\Queue;
 
-use Restack\Queue\DependencyArray;
+use \Restack\Queue\DependencyArray;
 
 class DependencyArrayTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +24,8 @@ class DependencyArrayTest extends \PHPUnit_Framework_TestCase
         $this->queue[ 'c' ] = self::VAL3;
         
         $this->assertEquals( 3, count( $this->queue->toArray() ) );
+        $this->assertEquals( array( 'a', 'b', 'c' ), array_keys( $this->queue->toArray() ) );
+        $this->assertEquals( array( self::VAL1, self::VAL2, self::VAL3 ), array_values( $this->queue->toArray() ) );
     }
     
     public function testBasicRetrieval()
@@ -33,6 +35,7 @@ class DependencyArrayTest extends \PHPUnit_Framework_TestCase
         $this->queue[ 'c' ] = self::VAL3;
         
         $this->assertEquals( array( 'a', 'b', 'c' ), array_keys( $this->queue->toArray() ) );
+        $this->assertEquals( array( self::VAL1, self::VAL2, self::VAL3 ), array_values( $this->queue->toArray() ) );
     }
     
     public function testDependencySetInNaturalOrder()
@@ -40,9 +43,10 @@ class DependencyArrayTest extends \PHPUnit_Framework_TestCase
         $this->queue[ 'a' ] = self::VAL1;
         $this->queue[ 'b' ] = self::VAL2;
         $this->queue[ 'c' ] = self::VAL3;
-        $this->queue->dependency( 'c', 'a' );
+        $this->queue->addDependency( 'c', 'a' );
         
         $this->assertEquals( array( 'a', 'b', 'c' ), array_keys( $this->queue->toArray() ) );
+        $this->assertEquals( array( self::VAL1, self::VAL2, self::VAL3 ), array_values( $this->queue->toArray() ) );
     }
     
     public function testDependencySetOutOfNaturalOrder()
@@ -50,9 +54,10 @@ class DependencyArrayTest extends \PHPUnit_Framework_TestCase
         $this->queue[ 'a' ] = self::VAL1;
         $this->queue[ 'b' ] = self::VAL2;
         $this->queue[ 'c' ] = self::VAL3;
-        $this->queue->dependency( 'a', 'b' );
+        $this->queue->addDependency( 'a', 'b' );
         
         $this->assertEquals( array( 'b', 'a', 'c' ), array_keys( $this->queue->toArray() ) );
+        $this->assertEquals( array( self::VAL2, self::VAL1, self::VAL3 ), array_values( $this->queue->toArray() ) );
     }
     
     public function testDependencyNesting()
@@ -60,10 +65,11 @@ class DependencyArrayTest extends \PHPUnit_Framework_TestCase
         $this->queue[ 'a' ] = self::VAL1;
         $this->queue[ 'b' ] = self::VAL2;
         $this->queue[ 'c' ] = self::VAL3;
-        $this->queue->dependency( 'a', 'b' );
-        $this->queue->dependency( 'b', 'c' );
+        $this->queue->addDependency( 'a', 'b' );
+        $this->queue->addDependency( 'b', 'c' );
         
         $this->assertEquals( array( 'c', 'b', 'a' ), array_keys( $this->queue->toArray() ) );
+        $this->assertEquals( array( self::VAL3, self::VAL2, self::VAL1 ), array_values( $this->queue->toArray() ) );
     }
     
     public function testDependencyDeepNesting()
@@ -77,12 +83,15 @@ class DependencyArrayTest extends \PHPUnit_Framework_TestCase
         $this->queue[ 'g' ] = self::VAL1;
         $this->queue[ 'h' ] = self::VAL2;
         
-        $this->queue->dependency( 'a', 'b' );
-        $this->queue->dependency( 'b', 'c' );
-        $this->queue->dependency( 'c', 'h' );
-        $this->queue->dependency( 'h', 'g' );
-        $this->queue->dependency( 'g', 'e' );
+        $this->queue->addDependency( 'a', 'b' );
+        $this->queue->addDependency( 'b', 'c' );
+        $this->queue->addDependency( 'c', 'h' );
+        $this->queue->addDependency( 'h', 'g' );
+        $this->queue->addDependency( 'g', 'e' );
         
         $this->assertEquals( array( 'e', 'g', 'h', 'c', 'b', 'a', 'd', 'f' ), array_keys( $this->queue->toArray() ) );
+        $this->assertEquals( array(
+            self::VAL2, self::VAL1, self::VAL2, self::VAL3, self::VAL2, self::VAL1, self::VAL1, self::VAL3
+        ), array_values( $this->queue->toArray() ) );
     }
 }
