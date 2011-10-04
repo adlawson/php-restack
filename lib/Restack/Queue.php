@@ -2,13 +2,13 @@
 
 namespace Restack;
 
-interface Queue
+interface Queue extends \Countable
 {
     public function count();
-    public function push( $value );
-    public function unshift( $value );
-    public function shift();
     public function pop();
+    public function push( $value );
+    public function shift();
+    public function unshift( $value );
 }
 
 interface AdvancedQueue extends Queue
@@ -34,7 +34,6 @@ interface SuperQueue extends AdvancedQueue
     public function removeRandom();
     public function shuffle();
     public function makeUnique();
-    
 }
 
 interface DoublyLinkedList extends Queue, Iterator, ArrayAccess
