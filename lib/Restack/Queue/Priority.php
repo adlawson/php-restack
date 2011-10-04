@@ -201,7 +201,8 @@ class Priority implements Storage, Dependable
      * Set the priority of an existing item
      * 
      * This is done by simply removing the item and
-     * reinserting with the new priority.
+     * reinserting with the new priority. Using this
+     * method could disrupt dependency tracking.
      * 
      * @param mixed $item
      * @param integer $priority
