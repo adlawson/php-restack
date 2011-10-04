@@ -8,17 +8,30 @@ use Restack\Queue\Priority;
 class PriorityTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * The data structure
+     * The data storage
      * @var Restack\Queue\Priority
      */
-    public static $queue;
+    public $queue;
     
     /**
      * Setup the Queue
+     * @return void
      */
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        self::$queue = new Priority;
+        $this->queue = new Priority;
+    }
+    
+    /**
+     * Insert storage items
+     * @return void
+     */
+    public function insert()
+    {
+        $this->queue->insert('a');
+        $this->queue->insert('b');
+        $this->queue->insert('c', 0);
+        $this->queue->insert('d', 999);
     }
     
     /**
@@ -26,56 +39,50 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testInsert()
     {
-        self::$queue->insert('hello');
-        self::$queue->insert('world');
-        self::$queue->insert('foo', 100);
-        self::$queue->insert('bar', 0);
-        
-        $this->assertSame(4, self::$queue->count());
+        $this->insert();
+        $this->assertSame(4, $this->queue->count());
     }
     
     /**
      * @covers Restack\Queue\Priority::getIterator()
-     * @depends testInsert
      */
     public function testIterator()
     {
+        $this->insert();
+        
         $items = array();
-        foreach (self::$queue as $item) {
+        foreach ($this->queue as $item) {
             $items[] = $item;
         }
         
-        $this->assertSame($items, array(
-            'foo',
-            'hello',
-            'world',
-            'bar'
-        ));
+        $this->assertSame(array('d', 'a', 'b', 'c'), $items);
     }
     
     /**
      * @covers Restack\Queue\Priority::getOrder()
-     * @depends testInsert
      */
     public function testGetOrder()
     {
-        $this->assertSame(Priority::DEFAULT_ORDER, self::$queue->getOrder('hello'));
-        $this->assertSame(Priority::DEFAULT_ORDER, self::$queue->getOrder('world'));
-        $this->assertSame(100, self::$queue->getOrder('foo'));
-        $this->assertSame(0, self::$queue->getOrder('bar'));
+        $this->insert();
+        
+        $this->assertSame($this->queue->getOrder('a'), Priority::DEFAULT_ORDER);
+        $this->assertSame($this->queue->getOrder('b'), Priority::DEFAULT_ORDER);
+        $this->assertSame($this->queue->getOrder('c'), 0);
+        $this->assertSame($this->queue->getOrder('d'), 999);
     }
     
     /**
      * @covers Restack\Queue\Priority::setOrder()
-     * @depends testGetOrder
      */
     public function testSetOrder()
     {
-        self::$queue->setOrder('hello', 9999);
-        $this->assertSame(9999, self::$queue->getOrder('hello'));
+        $this->insert();
+        
+        $this->queue->setOrder('c', 1337);
+        $this->assertSame($this->queue->getOrder('c'), 1337);
         
         try {
-            self::$queue->setOrder('invalid_item', 666);
+            $this->queue->setOrder('invalid_item', 666);
         } catch (InvalidItemException $e) {
             $this->assertTrue(true);
             return;
@@ -86,12 +93,13 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
     
     /**
      * @covers Restack\Queue\Priority::remove()
-     * @depends testSetOrder
      */
     public function testRemove()
     {
-        self::$queue->remove('world');
-        $this->assertSame(3, self::$queue->count());
+        $this->insert();
+        
+        $this->queue->remove('a');
+        $this->assertSame(3, $this->queue->count());
     }
     
     /**
@@ -100,7 +108,9 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testClear()
     {
-        self::$queue->clear();
-        $this->assertSame(0, self::$queue->count());
+        $this->insert();
+        
+        $this->queue->clear();
+        $this->assertSame(0, $this->queue->count());
     }
 }

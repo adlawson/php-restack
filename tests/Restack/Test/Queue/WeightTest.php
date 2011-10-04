@@ -8,74 +8,72 @@ use Restack\Queue\Weight;
 class WeightTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * The data structure
+     * The data storage
      * @var Restack\Queue\Weight
      */
-    public static $queue;
+    public $queue;
     
     /**
      * Setup the Queue
+     * @return void
      */
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        self::$queue = new Weight;
+        $this->queue = new Weight;
     }
     
     /**
-     * @covers Restack\Queue\Weight::insert()
+     * Insert storage items
+     * @return void
      */
-    public function testInsert()
+    public function insert()
     {
-        self::$queue->insert('hello');
-        self::$queue->insert('world');
-        self::$queue->insert('foo', 100);
-        self::$queue->insert('bar', 0);
-        
-        $this->assertSame(4, self::$queue->count());
+        $this->queue->insert('a');
+        $this->queue->insert('b');
+        $this->queue->insert('c', 0);
+        $this->queue->insert('d', 999);
     }
     
     /**
      * @covers Restack\Queue\Weight::getIterator()
-     * @depends testInsert
      */
     public function testIterator()
     {
+        $this->insert();
+        
         $items = array();
-        foreach (self::$queue as $item) {
+        foreach ($this->queue as $item) {
             $items[] = $item;
         }
         
-        $this->assertSame($items, array(
-            'bar',
-            'hello',
-            'world',
-            'foo'
-        ));
+        $this->assertSame(array('c', 'a', 'b', 'd'), $items);
     }
     
     /**
      * @covers Restack\Queue\Weight::getOrder()
-     * @depends testInsert
      */
     public function testGetOrder()
     {
-        $this->assertSame(Weight::DEFAULT_ORDER, self::$queue->getOrder('hello'));
-        $this->assertSame(Weight::DEFAULT_ORDER, self::$queue->getOrder('world'));
-        $this->assertSame(100, self::$queue->getOrder('foo'));
-        $this->assertSame(0, self::$queue->getOrder('bar'));
+        $this->insert();
+        
+        $this->assertSame($this->queue->getOrder('a'), Weight::DEFAULT_ORDER);
+        $this->assertSame($this->queue->getOrder('b'), Weight::DEFAULT_ORDER);
+        $this->assertSame($this->queue->getOrder('c'), 0);
+        $this->assertSame($this->queue->getOrder('d'), 999);
     }
     
     /**
      * @covers Restack\Queue\Weight::setOrder()
-     * @depends testGetOrder
      */
     public function testSetOrder()
     {
-        self::$queue->setOrder('hello', 9999);
-        $this->assertSame(9999, self::$queue->getOrder('hello'));
+        $this->insert();
+        
+        $this->queue->setOrder('c', 1337);
+        $this->assertSame($this->queue->getOrder('c'), 1337);
         
         try {
-            self::$queue->setOrder('invalid_item', 666);
+            $this->queue->setOrder('invalid_item', 666);
         } catch (InvalidItemException $e) {
             $this->assertTrue(true);
             return;
