@@ -3,19 +3,34 @@
 namespace Restack\Queue;
 
 use \Restack\Exception\CircularDependencyException;
-
 use \Restack\Queue\Index;
+use \Restack\Queue\DependencyAlgorithm;
 
+/**
+ * Dependency aware Index
+ */
 class DependencyIndex extends Index
 {
-    private $children = array();
+    /** @var array A list of member dependencies */
+    private $dependencies = array();
     
+    /**
+     * Sort the index based on a sorting algorithm and return the result
+     * 
+     * Re-order the index in a way that prioritises dependencies first
+     * This method is optimised via a result cache
+     * 
+     * @throws CircularDependencyException
+     * @return array
+     */
     public function sort()
     {
         switch( $this->getState() )
         {                
             case Index::STATE_UNSORTED:
-                DependencySorter::sort( $this );
+                DependencyAlgorithm::pre( $this );
+                DependencyAlgorithm::run( $this );
+                DependencyAlgorithm::post( $this );
                 
             case Index::STATE_SORTED:
                 return $this->getMembers();
@@ -26,37 +41,68 @@ class DependencyIndex extends Index
         }
     }
     
+    /**
+     * Create a member dependency
+     * 
+     * Add a parent/child dependency mapping for use by the sorting algorithm
+     * 
+     * @param string $parent
+     * @param string $child
+     */
     public function addDependency( $parent, $child )
     {
-        if( !isset( $this->children[ $parent ] ) )
+        if( !isset( $this->dependencies[ $parent ] ) )
         {
-            $this->children[ $parent ] = array();
+            $this->dependencies[ $parent ] = array();
         }
         
-        $this->children[ $parent ][] = $child;
-        $this->children[ $parent ] = array_unique( $this->children[ $parent ], \SORT_STRING );
+        $this->dependencies[ $parent ][] = $child;
+        $this->dependencies[ $parent ] = array_unique( $this->dependencies[ $parent ], \SORT_STRING );
     }
     
+    /**
+     * Remove a member dependency
+     * 
+     * Remove a parent/child dependency mapping for use by the sorting algorithm
+     * 
+     * @param string $parent
+     * @param string $child 
+     */
     public function removeDependency( $parent, $child )
     {
-        if( isset( $this->children[ $parent ] ) )
+        if( isset( $this->dependencies[ $parent ] ) )
         {
-            $search = array_search( $child, $this->children[ $parent ] );
+            $search = array_search( $child, $this->dependencies[ $parent ] );
             
             if( false !== $search )
             {
-                unset( $this->children[ $parent ][ $search ] );
+                unset( $this->dependencies[ $parent ][ $search ] );
             }
         }
     }
     
-    public function getChildrenOf( $member )
+    /**
+     * Retrieve the dependency mapping for a single member
+     * 
+     * Returns an associative array of the parent/child mapping for a single member
+     * 
+     * @param string $member
+     * @return array|null 
+     */
+    public function getDependenciesOf( $member )
     {
-        return isset( $this->children[ $member ] ) ? $this->children[ $member ] : null;
+        return isset( $this->dependencies[ $member ] ) ? $this->dependencies[ $member ] : null;
     }
     
-    public function getChildren()
+    /**
+     * Retrieve an array containing all the dependency mappings
+     * 
+     * Returns an associative array of the parent/child mappings defined
+     * 
+     * @return array
+     */
+    public function getDependencies()
     {
-        return $this->children;
+        return $this->dependencies;
     }
 }
