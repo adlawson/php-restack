@@ -2,7 +2,6 @@
 
 namespace Restack\Queue;
 
-use Restack\Dependable;
 use Restack\Exception\InvalidItemException;
 use Restack\Storage;
 use SplPriorityQueue;
@@ -18,7 +17,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority implements Storage, Dependable
+class Priority extends Storage
 {
     const DEFAULT_ORDER = 1;
     
@@ -26,48 +25,19 @@ class Priority implements Storage, Dependable
      * Item index for normalising order
      * @var integer
      */
-    protected $index = PHP_INT_MAX;
+    private $index = PHP_INT_MAX;
     
     /**
-     * A temp storage of items to queue
+     * Map an item to a given priority
      * @var array
      */
-    protected $items = array();
+    private $map = array();
     
     /**
      * The queue
      * @var SplPriorityQueue
      */
-    protected $queue;
-    
-    /**
-     * Add an item dependency
-     * @param mixed $parent
-     * @param mixed $child
-     * @throws Restack\Exception\InvalidItemException
-     * @return void
-     */
-    public function addDependency($parent, $child)
-    {
-        if (!$this->exists($child)) {
-            throw new InvalidItemException('Can\'t add a dependency for a non-existent child item');
-        }
-        
-        try {
-            $parentKey = $this->getKey($parent);
-            $childKey  = $this->getKey($child);
-            
-            $childPriority = $this->items[$childKey]['priority'];
-            
-            // Reorder parent item and re-index child
-            if ($this->items[$parentKey]['priority'] <= $childPriority) {
-                $this->setOrder($parent, $childPriority);
-                $this->setOrder($child, $childPriority);
-            }
-        } catch (InvalidItemException $e) {
-            throw new InvalidItemException('Can\'t depend on a non-existent parent item');
-        }
-    }
+    private $queue;
     
     /**
      * Clear the queue
@@ -75,34 +45,11 @@ class Priority implements Storage, Dependable
      */
     public function clear()
     {
-        $this->index = PHP_INT_MAX;
-        $this->items = array();
-        $this->queue = null;
-    }
-    
-    /**
-     * Count the queue items
-     * @return integer
-     */
-    public function count()
-    {
-        return count($this->items);
-    }
-    
-    /**
-     * Check an item exists in the queue
-     * @param mixed $item
-     * @return boolean
-     */
-    public function exists($item)
-    {
-        foreach ($this->items as $value) {
-            if ($value['data'] === $item) {
-                return true;
-            }
-        }
+        parent::clear();
         
-        return false;
+        $this->index = PHP_INT_MAX;
+        $this->map   = array();
+        $this->queue = null;
     }
     
     /**
@@ -114,18 +61,8 @@ class Priority implements Storage, Dependable
      */
     public function insert($item, $priority = self::DEFAULT_ORDER)
     {
-        if ($this->exists($item)) {
-            throw new InvalidItemException('Item already exists');
-        }
-        
-        $priority = array($priority, $this->index--);
-        $this->queue = null;
-        
-        $this->items[] = array(
-            'data'      => $item,
-            'listeners' => array(),
-            'priority'  => $priority
-        );
+        parent::insert($item);
+        $this->setOrder($item, $priority);
     }
     
     /**
@@ -136,35 +73,10 @@ class Priority implements Storage, Dependable
      */
     public function remove($item)
     {
-        try {
-            $key = $this->getKey($item);
-            
-            unset($this->items[$key]);
-            $this->queue = null;
-        } catch (\Restack\Exception\InvalidItemException $e) {
-            throw new InvalidItemException('Can\'t remove non-existent item');
-        }
-    }
-    
-    /**
-     * Get the item index
-     * 
-     * This is the key under which the item
-     * is stored in the temporary storage, no the
-     * queue
-     * 
-     * @throws Restack\Exception\InvalidItemException
-     * @return integer
-     */
-    protected function getKey($item)
-    {
-        foreach ($this->items as $key => $value) {
-            if ($item === $value['data']) {
-                return $key;
-            }
-        }
+        $key = $this->search($item);
+        unset($this->map[$key]);
         
-        throw new InvalidItemException('Can\'t get the key of a non-existent item');
+        parent::remove($item);
     }
     
     /**
@@ -184,40 +96,26 @@ class Priority implements Storage, Dependable
     /**
      * Get the priority of an item
      * @param mixed $item
-     * @return integer|null
+     * @throws Restack\Exception\InvalidItemException
+     * @return integer
      */
     public function getOrder($item)
     {
-        foreach ($this->items as $value) {
-            if ($value['data'] === $item) {
-                return current($value['priority']);
-            }
-        }
-        
-        return null;
+        $key = $this->search($item);
+        return current($this->map[$key]);
     }
     
     /**
      * Set the priority of an existing item
-     * 
-     * This is done by simply removing the item and
-     * reinserting with the new priority. Using this
-     * method could disrupt dependency tracking.
-     * 
      * @param mixed $item
      * @param integer $priority
      * @throws Restack\Exception\InvalidItemException
-     * @return Restack\Queue\Priority
+     * @return void
      */
     public function setOrder($item, $priority)
     {
-        if ($this->exists($item)) {
-            $this->remove($item);
-            $this->insert($item, $priority);
-            return $this;
-        }
-        
-        throw new InvalidItemException('Can\'t set priority on a non-existent item');
+        $key = $this->search($item);
+        $this->map[$key] = array((int) $priority, $this->index--);
     }
     
     /**
@@ -226,11 +124,11 @@ class Priority implements Storage, Dependable
      */
     public function getQueue()
     {
-        if (null === $this->queue) {
+        if (self::STATE_UNSORTED === $this->getState()) {
             $this->queue = new SplPriorityQueue;
             
-            foreach ($this->items as $item) {
-                $this->queue->insert($item['data'], $item['priority']);
+            foreach ($this->getItems() as $key => $item) {
+                $this->queue->insert($item, $this->map[$key]);
             }
         }
         

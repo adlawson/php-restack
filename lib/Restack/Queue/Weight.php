@@ -21,9 +21,8 @@ class Weight extends Priority
      * @param integer $weight
      * @return void
      */
-    public function insert($item, $weight = 1)
+    public function insert($item, $weight = self::DEFAULT_ORDER)
     {
-        $weight = PHP_INT_MAX - (int) $weight;
         parent::insert($item, $weight);
     }
     
@@ -34,16 +33,11 @@ class Weight extends Priority
      */
     public function getOrder($item)
     {
-        $priority = parent::getOrder($item);
-        return PHP_INT_MAX - $priority;
+        return PHP_INT_MAX - parent::getOrder($item);
     }
     
     /**
      * Set the weight of an existing item
-     * 
-     * This is done by simply removing the item and
-     * reinserting with the new weight.
-     * 
      * @param mixed $item
      * @param integer $weight
      * @throws Restack\Exception\InvalidItemException
@@ -51,6 +45,6 @@ class Weight extends Priority
      */
     public function setOrder($item, $weight)
     {
-        return parent::setOrder($item, $weight);
+        return parent::setOrder($item, PHP_INT_MAX - (int) $weight);
     }
 }
