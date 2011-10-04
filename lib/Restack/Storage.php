@@ -26,7 +26,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
      * The storage state
      * @var integer
      */
-    private $state = self::STATE_SORTED;
+    private $state = self::STATE_UNSORTED;
     
     /**
      * Clear storage
