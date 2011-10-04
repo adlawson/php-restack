@@ -2,48 +2,53 @@
 
 namespace Restack\Queue;
 
-use Restack\Queue\DependencyStack;
+use Restack\Queue\DependencyIndex;
 
 class DependencyArray extends \ArrayObject
 {
-    /** @var DependencyStack */
-    private $stack;
+    /** @var DependencyIndex */
+    private $index;
     
     public function __construct( )
     {
-        $this->setStack( new DependencyStack );
+        $this->setIndex( new DependencyIndex );
     }
     
     public function offsetSet( $offset, $value )
     {
         parent::offsetSet( $offset, $value );
-        $this->getStack()->insert( $offset );
+        $this->getIndex()->insert( $offset );
     }
 
     public function offsetUnset( $offset )
     {
         parent::offsetUnset( $offset );
-        $this->getStack()->remove( $offset );
+         $this->getIndex()->remove( $offset );
     }
     
-    public function dependency( $parent, $child )
+    public function addDependency( $parent, $child )
     {
-        $this->getStack()->dependency( $parent, $child );
+        $this->getIndex()->addDependency( $parent, $child );
+    }
+    
+    public function removeDependency( $parent, $child )
+    {
+        $this->getIndex()->removeDependency( $parent, $child );
     }
     
     public function toArray()
     {
-        return array_combine( $this->getStack()->retrieve(), (array) $this );
+        return array_replace( array_flip( (array) $this->getIndex()->sort() ), (array) $this );
     }
     
-    /** @return DependencyStack */
-    public function getStack()
+    /** @return DependencyIndex */
+    public function getIndex()
     {
-        return $this->stack;
+        return $this->index;
     }
 
-    public function setStack( DependencyStack $stack )
+    public function setIndex( DependencyIndex $index )
     {
-        $this->stack = $stack;
+        $this->index = $index;
     }
 }
