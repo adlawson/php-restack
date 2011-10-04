@@ -21,14 +21,7 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->queue = new Priority;
-    }
-    
-    /**
-     * Insert storage items
-     * @return void
-     */
-    public function insert()
-    {
+        
         $this->queue->insert('a');
         $this->queue->insert('b');
         $this->queue->insert('c', 0);
@@ -40,9 +33,6 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testInsert()
     {
-        $this->insert();
-        
-        // Test a range of possible values
         $this->queue->insert('1');
         $this->queue->insert(1);
         $this->queue->insert(7E-10);
@@ -58,8 +48,6 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testIterator()
     {
-        $this->insert();
-        
         $items = array();
         foreach ($this->queue as $item) {
             $items[] = $item;
@@ -73,8 +61,6 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOrder()
     {
-        $this->insert();
-        
         $this->assertSame($this->queue->getOrder('a'), Priority::DEFAULT_ORDER);
         $this->assertSame($this->queue->getOrder('b'), Priority::DEFAULT_ORDER);
         $this->assertSame($this->queue->getOrder('c'), 0);
@@ -86,8 +72,6 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetOrder()
     {
-        $this->insert();
-        
         $this->queue->setOrder('c', 1337);
         $this->assertSame($this->queue->getOrder('c'), 1337);
         
@@ -106,8 +90,6 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemove()
     {
-        $this->insert();
-        
         $this->queue->remove('a');
         $this->assertSame(3, $this->queue->count());
     }
@@ -118,8 +100,6 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
      */
     public function testClear()
     {
-        $this->insert();
-        
         $this->queue->clear();
         $this->assertSame(0, $this->queue->count());
     }

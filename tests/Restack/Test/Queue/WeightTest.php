@@ -20,14 +20,7 @@ class WeightTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->queue = new Weight;
-    }
-    
-    /**
-     * Insert storage items
-     * @return void
-     */
-    public function insert()
-    {
+        
         $this->queue->insert('a');
         $this->queue->insert('b');
         $this->queue->insert('c', 0);
@@ -39,8 +32,6 @@ class WeightTest extends \PHPUnit_Framework_TestCase
      */
     public function testIterator()
     {
-        $this->insert();
-        
         $items = array();
         foreach ($this->queue as $item) {
             $items[] = $item;
@@ -54,8 +45,6 @@ class WeightTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOrder()
     {
-        $this->insert();
-        
         $this->assertSame($this->queue->getOrder('a'), Weight::DEFAULT_ORDER);
         $this->assertSame($this->queue->getOrder('b'), Weight::DEFAULT_ORDER);
         $this->assertSame($this->queue->getOrder('c'), 0);
@@ -67,8 +56,6 @@ class WeightTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetOrder()
     {
-        $this->insert();
-        
         $this->queue->setOrder('c', 1337);
         $this->assertSame($this->queue->getOrder('c'), 1337);
         
