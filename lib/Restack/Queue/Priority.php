@@ -74,7 +74,11 @@ class Priority extends Storage
     public function remove($item)
     {
         $key = $this->search($item);
-        unset($this->map[$key]);
+        
+        if (false !== $key)
+        {
+            unset($this->map[$key]);
+        }
         
         parent::remove($item);
     }
@@ -115,6 +119,12 @@ class Priority extends Storage
     public function setOrder($item, $priority)
     {
         $key = $this->search($item);
+        
+        if (false === $key)
+        {
+            throw new InvalidItemException('Item does not exist in storage');
+        }
+        
         $this->map[$key] = array((int) $priority, $this->index--);
     }
     

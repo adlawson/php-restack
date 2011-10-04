@@ -53,7 +53,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
      */
     public function exists($item)
     {
-        return in_array($item, $this->items);
+        return (false !== $this->search($item));
     }
     
     /**
@@ -81,6 +81,11 @@ abstract class Storage implements \Countable, \IteratorAggregate
     {
         $key = $this->search($item);
         
+        if (false === $key)
+        {
+            throw new InvalidItemException('Item does not exist in storage');
+        }
+        
         $this->setState(self::STATE_UNSORTED);
         unset($this->items[$key]);
     }
@@ -88,19 +93,11 @@ abstract class Storage implements \Countable, \IteratorAggregate
     /**
      * Search for an item in storage
      * @param mixed $item
-     * @throws Restack\Exception\InvalidItemException
-     * @return integer The item index
+     * @return integer|false Item key or false if not found
      */
     public function search($item)
     {
-        $key = array_search($item, $this->items);
-        
-        if (false === $key)
-        {
-            throw new InvalidItemException('Item does not exist in storage');
-        }
-        
-        return $key;
+        return array_search($item, $this->items, true);
     }
     
     /**

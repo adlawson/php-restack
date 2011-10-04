@@ -4,6 +4,7 @@ namespace Restack\Test\Queue;
 
 use Restack\Exception\InvalidItemException;
 use Restack\Queue\Priority;
+use stdClass;
 
 class PriorityTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,7 +41,16 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
     public function testInsert()
     {
         $this->insert();
-        $this->assertSame(4, $this->queue->count());
+        
+        // Test a range of possible values
+        $this->queue->insert('1');
+        $this->queue->insert(1);
+        $this->queue->insert(7E-10);
+        $this->queue->insert(false);
+        $this->queue->insert(array('test' => 'array'));
+        $this->queue->insert(new stdClass());
+        
+        $this->assertSame(10, $this->queue->count());
     }
     
     /**
