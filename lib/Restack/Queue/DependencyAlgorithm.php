@@ -9,7 +9,7 @@ use \Restack\Exception\UnmetDependencyException;
 /**
  * Dependency sorting algorithm for use with the DependencyIndex
  */
-class DependencySorter
+class DependencyAlgorithm
 {
     /**
      * Validate the index dependencies
@@ -19,7 +19,7 @@ class DependencySorter
      * @param DependencyIndex $index
      * @throws UnmetDependencyException
      */
-    public static function preSort( DependencyIndex $index )
+    public static function pre( DependencyIndex $index )
     {
         $dependencies = array();
         
@@ -41,10 +41,8 @@ class DependencySorter
      * 
      * @param DependencyIndex $index 
      */
-    public static function sort( DependencyIndex $index )
+    public static function run( DependencyIndex $index )
     {
-        self::preSort( $index );
-        
         $tempIndex = array();
         
         foreach( $index->getMembers() as $member )
@@ -65,8 +63,6 @@ class DependencySorter
 
         $index->setState( DependencyIndex::STATE_SORTED );
         $index->setMembers( array_values( $tempIndex ) );
-        
-        self::postSort( $index );
     }
 
     /**
@@ -77,7 +73,7 @@ class DependencySorter
      * @param DependencyIndex $index
      * @throws CircularDependencyException
      */
-    public static function postSort( DependencyIndex $index )
+    public static function post( DependencyIndex $index )
     {
         foreach( $index->getDependencies() as $member => $children )
         {
