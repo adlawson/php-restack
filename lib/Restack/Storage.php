@@ -34,7 +34,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
      */
     public function clear()
     {
-        $this->setItems(array());
+        $this->items = array();
     }
     
     /**
@@ -110,16 +110,6 @@ abstract class Storage implements \Countable, \IteratorAggregate
     public function getItems()
     {
         return $this->items;
-    }
-    
-    /**
-     * Set the item storage
-     * @param array $items
-     * @return void
-     */
-    private function setItems(array $items)
-    {
-        $this->items = $items;
     }
     
     /**
