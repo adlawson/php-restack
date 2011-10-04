@@ -95,6 +95,26 @@ class PriorityTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Restack\Queue\Priority::addDependency()
+     * @depends testRemove
+     */
+    public function testAddDependency()
+    {
+        self::$queue->addDependency('bar', 'foo');
+        
+        $items = array();
+        foreach (self::$queue as $item) {
+            $items[] = $item;
+        }
+        
+        $this->assertSame($items, array(
+            'bar',
+            'foo',
+            'hello'
+        ));
+    }
+    
+    /**
      * @covers Restack\Queue\Priority::remove()
      * @depends testRemove
      */

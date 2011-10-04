@@ -2,7 +2,7 @@
 
 namespace Restack\Queue;
 
-use Restack\Exception\CircularDependencyException;
+use Restack\Dependable;
 use Restack\Exception\InvalidItemException;
 use Restack\Storage;
 use SplPriorityQueue;
@@ -18,7 +18,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority implements Storage
+class Priority implements Storage, Dependable
 {
     const DEFAULT_ORDER = 1;
     
@@ -41,7 +41,35 @@ class Priority implements Storage
     protected $queue;
     
     /**
-     * Clear the queue and reset internal values
+     * Add an item dependency
+     * @param mixed $parent
+     * @param mixed $child
+     * @return void
+     */
+    public function addDependency($parent, $child)
+    {
+        if (!$this->exists($child)) {
+            throw new InvalidItemException('Can\'t add a dependency for a non-existent child item');
+        }
+        
+        try {
+            $parentKey = $this->getKey($parent);
+            $childKey  = $this->getKey($child);
+            
+            $childPriority = $this->items[$childKey]['priority'];
+            
+            // Reorder parent item and re-index child
+            if ($this->items[$parentKey]['priority'] < $childPriority) {
+                $this->setOrder($parent, $childPriority);
+                $this->setOrder($child, $childPriority);
+            }
+        } catch (InvalidItemException $e) {
+            throw new InvalidItemException('Can\'t depend on a non-existent parent item');
+        }
+    }
+    
+    /**
+     * Clear the queue
      * @return void
      */
     public function clear()
@@ -80,12 +108,16 @@ class Priority implements Storage
      * Add an element to the queue
      * @param mixed $item
      * @param integer $priority
+     * @throws Restack\Exception\InvalidItemException
      * @return void
      */
     public function insert($item, $priority = self::DEFAULT_ORDER)
     {
-        $priority = array($priority, $this->index--);
+        if ($this->exists($item)) {
+            throw new InvalidItemException('Item already exists');
+        }
         
+        $priority = array($priority, $this->index--);
         $this->queue = null;
         
         $this->items[] = array(
@@ -98,39 +130,40 @@ class Priority implements Storage
     /**
      * Remove an element from the queue
      * @param mixed $item
+     * @throws Restack\Exception\InvalidItemException
      * @return void
      */
     public function remove($item)
     {
-        $exists = false;
-        foreach ($this->items as $key => $value) {
-            if ($item === $value['data']) {
-                $exists = true;
-                break;
-            }
-        }
-        
-        if ($exists) {
+        try {
+            $key = $this->getKey($item);
+            
             unset($this->items[$key]);
             $this->queue = null;
+        } catch (\Restack\Exception\InvalidItemException $e) {
+            throw new InvalidItemException('Can\'t remove non-existent item');
         }
     }
     
     /**
-     * Get the queue instance
-     * @return SplPriorityQueue
+     * Get the item index
+     * 
+     * This is the key under which the item
+     * is stored in the temporary storage, no the
+     * queue
+     * 
+     * @throws Restack\Exception\InvalidItemException
+     * @return integer
      */
-    public function getQueue()
+    protected function getKey($item)
     {
-        if (null === $this->queue) {
-            $this->queue = new SplPriorityQueue;
-            
-            foreach ($this->items as $item) {
-                $this->queue->insert($item['data'], $item['priority']);
+        foreach ($this->items as $key => $value) {
+            if ($item === $value['data']) {
+                return $key;
             }
         }
         
-        return $this->queue;
+        throw new InvalidItemException('Can\'t get the key of a non-existent item');
     }
     
     /**
@@ -186,36 +219,19 @@ class Priority implements Storage
     }
     
     /**
-     * Add an item dependency
-     * @param mixed $target
-     * @param mixed $item
-     * @throws Restack\Exception\InvalidItemException
-     * @throws Restack\Exception\CircularDependencyException
-     * @throws Restack\Exception\InvalidItemException
-     * @return void
+     * Get the queue instance
+     * @return SplPriorityQueue
      */
-    public function addDependency($target, $item)
+    public function getQueue()
     {
-        if (!$this->exists($item)) {
-            throw new InvalidItemException('Can\'t track a dependency of a non-existent item');
-        }
-        
-        $exists = false;
-        foreach ($this->items as $key => $value) {
-            if ($value['data'] === $item && in_array($target, $value['listeners'])) {
-                throw new CircularDependencyException('Can\'t create circular or recursive dependencies');
-            }
+        if (null === $this->queue) {
+            $this->queue = new SplPriorityQueue;
             
-            if ($value['data'] === $target) {
-                $exists = true;
-                break;
+            foreach ($this->items as $item) {
+                $this->queue->insert($item['data'], $item['priority']);
             }
         }
         
-        if (!$exists) {
-            throw new InvalidItemException('Can\'t add a dependency listener to a non-existent target');
-        } elseif (!in_array($item, $this->items[$key]['listeners'])) {
-            $this->items[$key]['listeners'][] = $item;
-        }
+        return $this->queue;
     }
 }
