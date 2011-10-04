@@ -1,31 +1,31 @@
 <?php
 
-namespace Restack\Test\Queue;
+namespace Restack\Test\Dependency;
 
-use \Restack\Queue\DependencyIndex;
+use \Restack\Dependency\Index;
 
-class DependencyIndexTest extends \PHPUnit_Framework_TestCase
+class IndexTest extends \PHPUnit_Framework_TestCase
 {
     private $index;
     
     public function setUp()
     {
-        $this->index = new DependencyIndex;
+        $this->index = new Index;
     }
     
     public function testInsert()
     {
-        $this->assertEquals( DependencyIndex::STATE_SORTED, $this->index->getState() );
+        $this->assertEquals( Index::STATE_SORTED, $this->index->getState() );
         
         $this->index->insert( 'a' );
         $this->index->insert( 'b' );
         $this->index->insert( 'c' );
         
-        $this->assertEquals( DependencyIndex::STATE_UNSORTED, $this->index->getState() );
+        $this->assertEquals( Index::STATE_UNSORTED, $this->index->getState() );
         
         $this->index->sort();
         
-        $this->assertEquals( DependencyIndex::STATE_SORTED, $this->index->getState() );
+        $this->assertEquals( Index::STATE_SORTED, $this->index->getState() );
         $this->assertEquals( 3, count( $this->index->sort() ) );
     }
     

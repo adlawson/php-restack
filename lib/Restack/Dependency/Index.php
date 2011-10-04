@@ -1,15 +1,13 @@
 <?php
 
-namespace Restack\Queue;
+namespace Restack\Dependency;
 
-use \Restack\Exception\CircularDependencyException;
-use \Restack\Index;
-use \Restack\Queue\DependencyAlgorithm as Algorithm;
+use Restack\Exception\CircularDependencyException;
 
 /**
  * Dependency aware Index
  */
-class DependencyIndex extends Index
+class Index extends \Restack\Index
 {
     /** @var array A list of member dependencies */
     private $dependencies = array();

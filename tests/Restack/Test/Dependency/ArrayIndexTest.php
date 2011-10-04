@@ -1,10 +1,10 @@
 <?php
 
-namespace Restack\Test\Queue;
+namespace Restack\Test\Dependency;
 
-use \Restack\Queue\DependencyArray;
+use \Restack\Dependency\ArrayIndex;
 
-class DependencyArrayTest extends \PHPUnit_Framework_TestCase
+class ArrayIndexTest extends \PHPUnit_Framework_TestCase
 {
     private $queue;
     
@@ -14,7 +14,7 @@ class DependencyArrayTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->queue = new DependencyArray;
+        $this->queue = new ArrayIndex;
     }
     
     public function testInsert()

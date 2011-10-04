@@ -1,13 +1,11 @@
 <?php
 
-namespace Restack\Queue;
-
-use \Restack\Queue\DependencyIndex;
+namespace Restack\Dependency;
 
 /**
  * An dependency aware implimentation of ArrayObject
  */
-class DependencyArray extends \ArrayObject
+class ArrayIndex extends \ArrayObject
 {
     /** @var DependencyIndex The dependency index */
     private $index;
@@ -22,7 +20,7 @@ class DependencyArray extends \ArrayObject
     public function __construct( $array = array() )
     {
         parent::__construct( $array );
-        $this->setIndex( new DependencyIndex );
+        $this->setIndex( new Index );
     }
     
     /**
@@ -31,7 +29,7 @@ class DependencyArray extends \ArrayObject
      * @param string $parent
      * @param string $child 
      * 
-     * @see DependencyIndex::addDependency
+     * @see Index::addDependency
      */
     public function addDependency( $parent, $child )
     {
@@ -44,7 +42,7 @@ class DependencyArray extends \ArrayObject
      * @param string $parent
      * @param string $child 
      * 
-     * @see DependencyIndex::removeDependency
+     * @see Index::removeDependency
      */
     public function removeDependency( $parent, $child )
     {
@@ -56,7 +54,7 @@ class DependencyArray extends \ArrayObject
      * 
      * Sort the ArrayObject based on the defined dependencies
      * 
-     * @see DependencyIndex::sort
+     * @see Index::sort
      * 
      * @return type 
      */
@@ -92,7 +90,7 @@ class DependencyArray extends \ArrayObject
      * 
      * Returns the object used to sort the ArrayObject
      * 
-     * @return DependencyIndex
+     * @return Index
      */
     public function getIndex()
     {
@@ -104,9 +102,9 @@ class DependencyArray extends \ArrayObject
      * 
      * Replaces the previously defined index object used to sort the ArrayObject
      * 
-     * @param DependencyIndex $index 
+     * @param Index $index 
      */
-    public function setIndex( DependencyIndex $index )
+    public function setIndex( Index $index )
     {
         $this->index = $index;
     }

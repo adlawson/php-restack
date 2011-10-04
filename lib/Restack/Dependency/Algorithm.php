@@ -1,25 +1,24 @@
 <?php
 
-namespace Restack\Queue;
+namespace Restack\Dependency;
 
-use \Restack\Queue\DependencyIndex;
-use \Restack\Exception\CircularDependencyException;
-use \Restack\Exception\UnmetDependencyException;
+use Restack\Exception\CircularDependencyException;
+use Restack\Exception\UnmetDependencyException;
 
 /**
  * Dependency sorting algorithm for use with the DependencyIndex
  */
-class DependencyAlgorithm
+class Algorithm
 {
     /**
      * Validate the index dependencies
      * 
      * Check all defined children are members of the index
      * 
-     * @param DependencyIndex $index
+     * @param Index $index
      * @throws UnmetDependencyException
      */
-    public static function pre( DependencyIndex $index )
+    public static function pre( Index $index )
     {
         $dependencies = array();
         
@@ -39,9 +38,9 @@ class DependencyAlgorithm
      * 
      * Re-order the index in a way that prioritises dependencies first
      * 
-     * @param DependencyIndex $index 
+     * @param Index $index 
      */
-    public static function run( DependencyIndex $index )
+    public static function run( Index $index )
     {
         $tempIndex = array();
         
@@ -61,7 +60,7 @@ class DependencyAlgorithm
             }
         }
 
-        $index->setState( DependencyIndex::STATE_SORTED );
+        $index->setState( Index::STATE_SORTED );
         $index->setItems( array_values( $tempIndex ) );
     }
 
@@ -70,16 +69,16 @@ class DependencyAlgorithm
      * 
      * Check the output was not corrupted by errors such as circular dependencies
      * 
-     * @param DependencyIndex $index
+     * @param Index $index
      * @throws CircularDependencyException
      */
-    public static function post( DependencyIndex $index )
+    public static function post( Index $index )
     {
         foreach( $index->getDependencies() as $item => $children )
         {
             if( array_search( $item, $index->getItems() ) <= max( array_keys( array_intersect( $index->getItems(), $children ) ) ) )
             {
-                $index->setState( DependencyIndex::STATE_CORRUPT );
+                $index->setState( Index::STATE_CORRUPT );
                 throw new CircularDependencyException('Index corrupted');
             }
         }
