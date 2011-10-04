@@ -3,7 +3,7 @@
 namespace Restack\Queue;
 
 use Restack\Exception\InvalidItemException;
-use Restack\Storage;
+use Restack\Index;
 use SplPriorityQueue;
 
 /**
@@ -17,7 +17,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority extends Storage
+class Priority extends Index
 {
     const DEFAULT_ORDER = 1;
     
@@ -85,12 +85,13 @@ class Priority extends Storage
     
     /**
      * Get a cloned queue instance for iterating
-     * @param boolean $persist
+     * @param boolean $persist If false, iterated items will fall out of the queue
      * @return SplPriorityQueue
      */
     public function getIterator($persist = true)
     {
-        if ($persist) {
+        if ($persist)
+        {
             return clone $this->getQueue();
         }
         
@@ -134,10 +135,12 @@ class Priority extends Storage
      */
     public function getQueue()
     {
-        if (self::STATE_UNSORTED === $this->getState()) {
+        if (self::STATE_UNSORTED === $this->getState())
+        {
             $this->queue = new SplPriorityQueue;
             
-            foreach ($this->getItems() as $key => $item) {
+            foreach ($this->getItems() as $key => $item)
+            {
                 $this->queue->insert($item, $this->map[$key]);
             }
         }

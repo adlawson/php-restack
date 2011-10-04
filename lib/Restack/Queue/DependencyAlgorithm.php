@@ -28,7 +28,7 @@ class DependencyAlgorithm
             $dependencies = array_merge( $dependencies, $children );
         }
         
-        if( count( array_diff( array_unique( $dependencies ), $index->getMembers() ) ) )
+        if( count( array_diff( array_unique( $dependencies ), $index->getItems() ) ) )
         {
             throw new UnmetDependencyException('Required value not found in index');
         }
@@ -45,11 +45,11 @@ class DependencyAlgorithm
     {
         $tempIndex = array();
         
-        foreach( $index->getMembers() as $member )
+        foreach( $index->getItems() as $item )
         {
-            $search = array_search( $member, $tempIndex );
+            $search = array_search( $item, $tempIndex );
             
-            if( $children = $index->getDependenciesOf( $member ) )
+            if( $children = $index->getDependenciesOf( $item ) )
             {
                 array_splice( $tempIndex, ( false !== $search ) ? $search : 0, 0, $children );
                 $tempIndex = array_unique( $tempIndex );
@@ -57,12 +57,12 @@ class DependencyAlgorithm
             
             if( false === $search )
             {
-                $tempIndex[] = $member;
+                $tempIndex[] = $item;
             }
         }
 
         $index->setState( DependencyIndex::STATE_SORTED );
-        $index->setMembers( array_values( $tempIndex ) );
+        $index->setItems( array_values( $tempIndex ) );
     }
 
     /**
@@ -75,9 +75,9 @@ class DependencyAlgorithm
      */
     public static function post( DependencyIndex $index )
     {
-        foreach( $index->getDependencies() as $member => $children )
+        foreach( $index->getDependencies() as $item => $children )
         {
-            if( array_search( $member, $index->getMembers() ) <= max( array_keys( array_intersect( $index->getMembers(), $children ) ) ) )
+            if( array_search( $item, $index->getItems() ) <= max( array_keys( array_intersect( $index->getItems(), $children ) ) ) )
             {
                 $index->setState( DependencyIndex::STATE_CORRUPT );
                 throw new CircularDependencyException('Index corrupted');

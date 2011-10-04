@@ -3,7 +3,7 @@
 namespace Restack\Queue;
 
 use \Restack\Exception\CircularDependencyException;
-use \Restack\Queue\Index;
+use \Restack\Index;
 use \Restack\Queue\DependencyAlgorithm as Algorithm;
 
 /**
@@ -33,7 +33,7 @@ class DependencyIndex extends Index
                 Algorithm::post( $this );
                 
             case Index::STATE_SORTED:
-                return $this->getMembers();
+                return $this->getItems();
                 
             default:
                 $this->setState( Index::STATE_CORRUPT );

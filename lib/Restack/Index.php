@@ -2,15 +2,16 @@
 
 namespace Restack;
 
+use ArrayIterator;
 use Restack\Exception\InvalidItemException;
 
 /**
  * Typical item storage interface
  * 
  * @category  Restack
- * @package   Restack\Storage
+ * @package   Restack
  */
-abstract class Storage implements \Countable, \IteratorAggregate
+abstract class Index implements \Countable, \IteratorAggregate
 {
     const STATE_UNSORTED = 0;
     const STATE_SORTED   = 1;
@@ -23,10 +24,10 @@ abstract class Storage implements \Countable, \IteratorAggregate
     private $items = array();  
     
     /**
-     * The storage state
+     * The index state
      * @var integer
      */
-    private $state = self::STATE_UNSORTED;
+    private $state = self::STATE_SORTED;
     
     /**
      * Clear storage
@@ -47,7 +48,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
     }
     
     /**
-     * Check if an item exists in storage
+     * Check if an item exists in the index
      * @param mixed $item
      * @return boolean
      */
@@ -57,7 +58,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
     }
     
     /**
-     * Insert an item into storage
+     * Insert an item into the index
      * @param mixed $item
      * @return void
      */
@@ -73,7 +74,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
     }
     
     /**
-     * Remove an item from storage
+     * Remove an item from the index
      * @param mixed $item
      * @return void
      */
@@ -101,7 +102,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
     }
     
     /**
-     * Get the item storage
+     * Get the item index
      * @return array
      */
     public function getItems()
@@ -110,7 +111,25 @@ abstract class Storage implements \Countable, \IteratorAggregate
     }
     
     /**
-     * Get the storage state
+     * Set the item index
+     * @param array $items
+     */
+    public function setItems(array $items)
+    {
+        $this->items = $items;
+    }
+    
+    /**
+     * Get the index iterator
+     * @return Traversable
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->getItems());
+    }
+    
+    /**
+     * Get the index state
      * @return integer
      */
     public function getState()
@@ -119,7 +138,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Set the storage state
+     * Set the index state
      * @param integer $state
      * @return void
      */
