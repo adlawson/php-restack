@@ -12,7 +12,7 @@ abstract class Index
     const STATE_SORTED   = 1;
     const STATE_CORRUPT  = 2;
     
-    /** @var array A simple list index members */
+    /** @var array A simple list of index members */
     private $members = array();
     
     /** @var int A class constant which defines the index state */
