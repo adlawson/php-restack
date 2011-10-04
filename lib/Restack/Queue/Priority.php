@@ -44,6 +44,7 @@ class Priority implements Storage, Dependable
      * Add an item dependency
      * @param mixed $parent
      * @param mixed $child
+     * @throws Restack\Exception\InvalidItemException
      * @return void
      */
     public function addDependency($parent, $child)
