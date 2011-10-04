@@ -60,7 +60,7 @@ class Priority implements Storage, Dependable
             $childPriority = $this->items[$childKey]['priority'];
             
             // Reorder parent item and re-index child
-            if ($this->items[$parentKey]['priority'] < $childPriority) {
+            if ($this->items[$parentKey]['priority'] <= $childPriority) {
                 $this->setOrder($parent, $childPriority);
                 $this->setOrder($child, $childPriority);
             }

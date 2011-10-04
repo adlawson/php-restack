@@ -66,6 +66,27 @@ class WeightTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * @covers Restack\Queue\Priority::addDependency()
+     * @depends testGetOrder
+     */
+    public function testAddDependency()
+    {
+        self::$queue->addDependency('foo', 'bar');
+        
+        $items = array();
+        foreach (self::$queue as $item) {
+            $items[] = $item;
+        }
+        
+        $this->assertSame($items, array(
+            'hello',
+            'world',
+            'foo',
+            'bar'
+        ));
+    }
+    
+    /**
      * @covers Restack\Queue\Weight::setOrder()
      * @depends testGetOrder
      */
