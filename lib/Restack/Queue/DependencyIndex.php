@@ -41,7 +41,7 @@ class DependencyIndex extends Index
     /**
      * Create a member dependency
      * 
-     * Add a parent-child dependency mapping for use by the sorting algorithm
+     * Add a parent/child dependency mapping for use by the sorting algorithm
      * 
      * @param string $parent
      * @param string $child
@@ -60,7 +60,7 @@ class DependencyIndex extends Index
     /**
      * Remove a member dependency
      * 
-     * Remove a parent/-/child dependency mapping for use by the sorting algorithm
+     * Remove a parent/child dependency mapping for use by the sorting algorithm
      * 
      * @param string $parent
      * @param string $child 
