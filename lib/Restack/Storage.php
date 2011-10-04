@@ -53,7 +53,7 @@ abstract class Storage implements \Countable, \IteratorAggregate
      */
     public function exists($item)
     {
-        return (bool) array_search($item, $this->items);
+        return in_array($item, $this->items);
     }
     
     /**
