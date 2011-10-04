@@ -4,6 +4,7 @@ namespace Restack\Queue;
 
 use \Restack\Exception\CircularDependencyException;
 use \Restack\Queue\Index;
+use \Restack\Queue\DependencyAlgorithm;
 
 /**
  * Dependency aware Index
@@ -27,7 +28,9 @@ class DependencyIndex extends Index
         switch( $this->getState() )
         {                
             case Index::STATE_UNSORTED:
-                DependencySorter::sort( $this );
+                DependencyAlgorithm::pre( $this );
+                DependencyAlgorithm::run( $this );
+                DependencyAlgorithm::post( $this );
                 
             case Index::STATE_SORTED:
                 return $this->getMembers();
