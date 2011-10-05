@@ -54,7 +54,8 @@ class Algorithm
         {
             $search = array_search( $item, $tempIndex );
             
-            if( $children = $index->getDependenciesOf( $item ) )
+            $children = $index->getDependenciesOf( $item );
+            if( null !== $children )
             {
                 array_splice( $tempIndex, ( false !== $search ) ? $search : 0, 0, $children );
                 $tempIndex = array_unique( $tempIndex );
