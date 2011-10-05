@@ -5,11 +5,17 @@ namespace Restack\Dependency;
 use Restack\Exception\CircularDependencyException;
 
 /**
- * Dependency aware Index
+ * Dependency aware index
+ * 
+ * @category  Restack
+ * @package   Restack\Dependency
  */
 class Index extends \Restack\Index
 {
-    /** @var array A list of member dependencies */
+    /**
+     * Item dependencies
+     * @var array
+     */
     private $dependencies = array();
     
     /**
@@ -18,7 +24,7 @@ class Index extends \Restack\Index
      * Re-order the index in a way that prioritises dependencies first
      * This method is optimised via a result cache
      * 
-     * @throws CircularDependencyException
+     * @throws Restack\Exception\CircularDependencyException
      * @return array
      */
     public function sort()
@@ -40,12 +46,10 @@ class Index extends \Restack\Index
     }
     
     /**
-     * Create a member dependency
-     * 
-     * Add a parent/child dependency mapping for use by the sorting algorithm
-     * 
+     * Add an item dependency
      * @param string $parent
      * @param string $child
+     * @return void
      */
     public function addDependency( $parent, $child )
     {
@@ -59,12 +63,10 @@ class Index extends \Restack\Index
     }
     
     /**
-     * Remove a member dependency
-     * 
-     * Remove a parent/child dependency mapping for use by the sorting algorithm
-     * 
+     * Remove an item dependency
      * @param string $parent
-     * @param string $child 
+     * @param string $child
+     * @return void
      */
     public function removeDependency( $parent, $child )
     {
@@ -81,23 +83,17 @@ class Index extends \Restack\Index
     
     /**
      * Retrieve the dependency mapping for a single member
-     * 
-     * Returns an associative array of the parent/child mapping for a single member
-     * 
-     * @param string $member
-     * @return array|null 
+     * @param string $item
+     * @return array|null An associative array of the parent/child mapping for a single member
      */
-    public function getDependenciesOf( $member )
+    public function getDependenciesOf( $item )
     {
-        return isset( $this->dependencies[ $member ] ) ? $this->dependencies[ $member ] : null;
+        return isset( $this->dependencies[ $item ] ) ? $this->dependencies[ $item ] : null;
     }
     
     /**
      * Retrieve an array containing all the dependency mappings
-     * 
-     * Returns an associative array of the parent/child mappings defined
-     * 
-     * @return array
+     * @return array An associative array of the parent/child mappings defined
      */
     public function getDependencies()
     {

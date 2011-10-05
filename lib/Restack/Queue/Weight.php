@@ -3,7 +3,7 @@
 namespace Restack\Queue;
 
 /**
- * Reusable, injectable weight ordered queue.
+ * Weight ordered queue.
  * Items added to the queue are accessed in queue fashion,
  * meaning; first in, first out.
  * 

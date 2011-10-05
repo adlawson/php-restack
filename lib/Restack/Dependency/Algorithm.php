@@ -6,7 +6,11 @@ use Restack\Exception\CircularDependencyException;
 use Restack\Exception\UnmetDependencyException;
 
 /**
- * Dependency sorting algorithm for use with the DependencyIndex
+ * Dependency sorting algorithm for use
+ * with the dependency index
+ * 
+ * @category  Restack
+ * @package   Restack\Dependency
  */
 class Algorithm
 {
@@ -15,8 +19,9 @@ class Algorithm
      * 
      * Check all defined children are members of the index
      * 
-     * @param Index $index
-     * @throws UnmetDependencyException
+     * @param Restack\Dependency\Index $index
+     * @throws Restack\Exception\UnmetDependencyException
+     * @return void
      */
     public static function pre( Index $index )
     {
@@ -38,7 +43,8 @@ class Algorithm
      * 
      * Re-order the index in a way that prioritises dependencies first
      * 
-     * @param Index $index 
+     * @param Restack\Dependency\Index $index 
+     * @return void
      */
     public static function run( Index $index )
     {
@@ -69,8 +75,9 @@ class Algorithm
      * 
      * Check the output was not corrupted by errors such as circular dependencies
      * 
-     * @param Index $index
-     * @throws CircularDependencyException
+     * @param Restack\Dependency\Index $index
+     * @throws Restack\Exception\CircularDependencyException
+     * @return void
      */
     public static function post( Index $index )
     {

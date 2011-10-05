@@ -6,7 +6,7 @@ use ArrayIterator;
 use Restack\Exception\InvalidItemException;
 
 /**
- * Typical item storage interface
+ * Basic item storage
  * 
  * @category  Restack
  * @package   Restack
