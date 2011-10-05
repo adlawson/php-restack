@@ -2,6 +2,10 @@
 
 namespace Restack;
 
+/**
+ * Notes:
+ * Restack\Index could implement now with minor changes
+ */
 interface Queue extends \Countable
 {
     public function count();
@@ -11,6 +15,10 @@ interface Queue extends \Countable
     public function unshift( $value );
 }
 
+/**
+ * Notes:
+ * Could be merged with SuperQueue - I don't see the need to separate them
+ */
 interface AdvancedQueue extends Queue
 {
     public function clear();
@@ -24,6 +32,10 @@ interface AdvancedQueue extends Queue
     public function walk( $callback, $userdata );
 }
 
+/**
+ * Notes:
+ * As noted above, maybe this should be merged with AdvancedQueue?
+ */
 interface SuperQueue extends AdvancedQueue
 {
     public function diff( array $array1 );
@@ -36,6 +48,10 @@ interface SuperQueue extends AdvancedQueue
     public function makeUnique();
 }
 
+/**
+ * Notes:
+ * 
+ */
 interface DoublyLinkedList extends Queue, Iterator, ArrayAccess
 {
     public function getIteratorMode();
@@ -43,6 +59,12 @@ interface DoublyLinkedList extends Queue, Iterator, ArrayAccess
     public function isEmpty();
 }
 
+/**
+ * Notes:
+ * Could be a good addition with top(), bottom() and valid()
+ * That said, I don't like implementing Iterator, much prefer IteratorAggregate
+ * Crude benchmarks (@link http://www.garfieldtech.com/blog/magic-benchmarks)
+ */
 interface Iterator extends \Iterator, \Countable
 {
     public function rewind();
@@ -55,6 +77,10 @@ interface Iterator extends \Iterator, \Countable
     public function top();
 }
 
+/**
+ * Notes:
+ * Still unsure about ArrayAccess but might be useful
+ */
 interface ArrayAccess extends \ArrayAccess
 {
     public function offsetExists( $index );
@@ -63,6 +89,10 @@ interface ArrayAccess extends \ArrayAccess
     public function offsetUnset( $index );
 }
 
+/**
+ * Notes:
+ * As noted above, I much prefer this than Iterator
+ */
 interface IteratorAggregate extends \IteratorAggregate
 {
     public function getIterator();
