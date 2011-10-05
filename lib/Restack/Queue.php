@@ -43,7 +43,7 @@ interface DoublyLinkedList extends Queue, Iterator, ArrayAccess
     public function isEmpty();
 }
 
-interface Iterator extends \Iterator, \Transversable, \Countable
+interface Iterator extends \Iterator, \Countable
 {
     public function rewind();
     public function current();
@@ -63,7 +63,7 @@ interface ArrayAccess extends \ArrayAccess
     public function offsetUnset( $index );
 }
 
-interface IteratorAggregate extends \IteratorAggregate, \Transversable
+interface IteratorAggregate extends \IteratorAggregate
 {
     public function getIterator();
     public function setIterator();
