@@ -84,26 +84,6 @@ class Priority extends Index
     }
     
     /**
-     * Set the item index
-     * 
-     * The items will all be given the default
-     * priority and will appear in the queue in the
-     * order they are given
-     * 
-     * @param array $items
-     * @return void
-     */
-    public function setItems(array $items)
-    {
-        $this->clear();
-        
-        foreach ($items as $item)
-        {
-            $this->insert($item);
-        }
-    }
-    
-    /**
      * Get a cloned queue instance for iterating
      * @param boolean $persist If false, iterated items will fall out of the queue
      * @return SplPriorityQueue

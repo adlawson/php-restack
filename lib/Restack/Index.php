@@ -117,7 +117,14 @@ abstract class Index implements \Countable, \IteratorAggregate
      */
     public function setItems(array $items)
     {
-        $this->items = $items;
+        $this->clear();
+        
+        foreach ($items as $item)
+        {
+            $this->insert($item);
+        }
+        
+        $this->setState(self::STATE_SORTED);
     }
     
     /**
