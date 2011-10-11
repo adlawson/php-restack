@@ -113,6 +113,7 @@ abstract class Index implements \Countable, \IteratorAggregate
     /**
      * Set the item index
      * @param array $items
+     * @return void
      */
     public function setItems(array $items)
     {
