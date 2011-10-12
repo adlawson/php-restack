@@ -4,6 +4,7 @@ namespace Restack\Dependency;
 
 use Restack\Exception\CircularDependencyException;
 use Restack\Exception\UnmetDependencyException;
+use Restack\Index;
 
 /**
  * Dependency sorting algorithm for use
@@ -19,20 +20,20 @@ class Algorithm
      * 
      * Check all defined children are members of the index
      * 
-     * @param Restack\Dependency\Index $index
+     * @param Restack\Dependency\Provider $provider
      * @throws Restack\Exception\UnmetDependencyException
      * @return void
      */
-    public static function pre( Index $index )
+    public static function pre( Provider $provider )
     {
         $dependencies = array();
         
-        foreach( $index->getDependencies() as $children )
+        foreach( $provider->getDependencies() as $children )
         {
             $dependencies = array_merge( $dependencies, $children );
         }
         
-        if( count( array_diff( array_unique( $dependencies ), $index->getItems() ) ) )
+        if( count( array_diff( array_unique( $dependencies ), $provider->getIndex()->getItems() ) ) )
         {
             throw new UnmetDependencyException('Required value not found in index');
         }
@@ -43,18 +44,18 @@ class Algorithm
      * 
      * Re-order the index in a way that prioritises dependencies first
      * 
-     * @param Restack\Dependency\Index $index 
+     * @param Restack\Dependency\Provider $provider 
      * @return void
      */
-    public static function run( Index $index )
+    public static function run( Provider $provider )
     {
         $tempIndex = array();
         
-        foreach( $index->getItems() as $item )
+        foreach( $provider->getIndex()->getItems() as $item )
         {
             $search = array_search( $item, $tempIndex );
             
-            $children = $index->getDependenciesOf( $item );
+            $children = $provider->getItemDependencies( $item );
             if( null !== $children )
             {
                 array_splice( $tempIndex, ( false !== $search ) ? $search : 0, 0, $children );
@@ -67,8 +68,8 @@ class Algorithm
             }
         }
 
-        $index->setState( Index::STATE_SORTED );
-        $index->setItems( array_values( $tempIndex ) );
+        $provider->getIndex()->setState( Index::STATE_SORTED );
+        $provider->getIndex()->setItems( array_values( $tempIndex ) );
     }
 
     /**
@@ -76,17 +77,17 @@ class Algorithm
      * 
      * Check the output was not corrupted by errors such as circular dependencies
      * 
-     * @param Restack\Dependency\Index $index
+     * @param Restack\Dependency\Provider $provider
      * @throws Restack\Exception\CircularDependencyException
      * @return void
      */
-    public static function post( Index $index )
+    public static function post( Provider $provider )
     {
-        foreach( $index->getDependencies() as $item => $children )
+        foreach( $provider->getDependencies() as $item => $children )
         {
-            if( array_search( $item, $index->getItems() ) <= max( array_keys( array_intersect( $index->getItems(), $children ) ) ) )
+            if( array_search( $item, $provider->getIndex()->getItems() ) <= max( array_keys( array_intersect( $provider->getIndex()->getItems(), $children ) ) ) )
             {
-                $index->setState( Index::STATE_CORRUPT );
+                $provider->getIndex()->setState( Index::STATE_CORRUPT );
                 throw new CircularDependencyException('Index corrupted');
             }
         }

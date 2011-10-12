@@ -14,6 +14,9 @@ class ArrayIndexTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
+        // Method under review
+        $this->markTestIncomplete('ArrayIndex is currently under review');
+        
         $this->queue = new ArrayIndex;
     }
     
