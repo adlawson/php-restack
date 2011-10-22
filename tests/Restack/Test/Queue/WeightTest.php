@@ -14,7 +14,11 @@ class WeightTest extends IndexTestCase
     public function setUp()
     {
         $this->setIndex(new Weight);
-        parent::setUp();
+        
+        $this->getIndex()->insert('a');
+        $this->getIndex()->insert('b');
+        $this->getIndex()->insert('c', 0);
+        $this->getIndex()->insert('d', 999);
     }
     
     /**
@@ -24,7 +28,8 @@ class WeightTest extends IndexTestCase
     public function testIterator()
     {
         $items = array();
-        foreach ($this->getIndex() as $item) {
+        foreach ($this->getIndex() as $item)
+        {
             $items[] = $item;
         }
         

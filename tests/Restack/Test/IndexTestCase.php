@@ -24,6 +24,7 @@ abstract class IndexTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Set the index instance
      * @param Restack\Index $index
+     * @return void
      */
     public function setIndex(Index $index)
     {
@@ -38,8 +39,8 @@ abstract class IndexTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->getIndex()->insert('a');
         $this->getIndex()->insert('b');
-        $this->getIndex()->insert('c', 0);
-        $this->getIndex()->insert('d', 999);
+        $this->getIndex()->insert('c');
+        $this->getIndex()->insert('d');
     }
     
     /**
