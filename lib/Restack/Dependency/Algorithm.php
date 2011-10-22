@@ -8,7 +8,7 @@ use Restack\Index;
 
 /**
  * Dependency sorting algorithm for use
- * with the dependency index
+ * with the dependency provider
  * 
  * @category  Restack
  * @package   Restack\Dependency
@@ -24,16 +24,16 @@ class Algorithm
      * @throws Restack\Exception\UnmetDependencyException
      * @return void
      */
-    public static function pre( Provider $provider )
+    public static function pre(Provider $provider)
     {
         $dependencies = array();
         
-        foreach( $provider->getDependencies() as $children )
+        foreach ($provider->getDependencies() as $children)
         {
-            $dependencies = array_merge( $dependencies, $children );
+            $dependencies = array_merge($dependencies, $children);
         }
         
-        if( count( array_diff( array_unique( $dependencies ), $provider->getIndex()->getItems() ) ) )
+        if (count(array_diff(array_unique($dependencies), $provider->getIndex()->getItems())))
         {
             throw new UnmetDependencyException('Required value not found in index');
         }
@@ -47,29 +47,29 @@ class Algorithm
      * @param Restack\Dependency\Provider $provider 
      * @return void
      */
-    public static function run( Provider $provider )
+    public static function run(Provider $provider)
     {
         $tempIndex = array();
         
-        foreach( $provider->getIndex()->getItems() as $item )
+        foreach ($provider->getIndex()->getItems() as $item)
         {
-            $search = array_search( $item, $tempIndex );
+            $search = array_search($item, $tempIndex);
             
             $children = $provider->getItemDependencies( $item );
-            if( null !== $children )
+            if (null !== $children)
             {
-                array_splice( $tempIndex, ( false !== $search ) ? $search : 0, 0, $children );
-                $tempIndex = array_unique( $tempIndex );
+                array_splice($tempIndex, (false !== $search) ? $search : 0, 0, $children);
+                $tempIndex = array_unique($tempIndex);
             }
             
-            if( false === $search )
+            if (false === $search)
             {
                 $tempIndex[] = $item;
             }
         }
 
-        $provider->getIndex()->setState( Index::STATE_SORTED );
-        $provider->getIndex()->setItems( array_values( $tempIndex ) );
+        $provider->getIndex()->setState(Index::STATE_SORTED);
+        $provider->getIndex()->setItems(array_values($tempIndex));
     }
 
     /**
@@ -81,13 +81,13 @@ class Algorithm
      * @throws Restack\Exception\CircularDependencyException
      * @return void
      */
-    public static function post( Provider $provider )
+    public static function post(Provider $provider)
     {
-        foreach( $provider->getDependencies() as $item => $children )
+        foreach ($provider->getDependencies() as $item => $children)
         {
-            if( array_search( $item, $provider->getIndex()->getItems() ) <= max( array_keys( array_intersect( $provider->getIndex()->getItems(), $children ) ) ) )
+            if (array_search($item, $provider->getIndex()->getItems()) <= max(array_keys(array_intersect($provider->getIndex()->getItems(), $children))))
             {
-                $provider->getIndex()->setState( Index::STATE_CORRUPT );
+                $provider->getIndex()->setState(Index::STATE_CORRUPT);
                 throw new CircularDependencyException('Index corrupted');
             }
         }

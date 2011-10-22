@@ -6,7 +6,7 @@ use Restack\Index;
 use Restack\Exception\CircularDependencyException;
 
 /**
- * Dependency aware index
+ * Dependency provider
  * 
  * @category  Restack
  * @package   Restack\Dependency
@@ -46,12 +46,12 @@ class Provider
      */
     public function sort()
     {
-        switch( $this->getIndex()->getState() )
+        switch ($this->getIndex()->getState())
         {                
             case Index::STATE_UNSORTED:
-                Algorithm::pre( $this );
-                Algorithm::run( $this );
-                Algorithm::post( $this );
+                Algorithm::pre($this);
+                Algorithm::run($this);
+                Algorithm::post($this);
                 
             case Index::STATE_SORTED:
                 return $this->getIndex()->getItems();
@@ -68,15 +68,15 @@ class Provider
      * @param string $child
      * @return void
      */
-    public function addDependency( $parent, $child )
+    public function addDependency($parent, $child)
     {
-        if( !isset( $this->dependencies[ $parent ] ) )
+        if (!isset($this->dependencies[$parent]))
         {
-            $this->dependencies[ $parent ] = array();
+            $this->dependencies[$parent] = array();
         }
         
-        $this->dependencies[ $parent ][] = $child;
-        $this->dependencies[ $parent ] = array_unique( $this->dependencies[ $parent ], \SORT_STRING );
+        $this->dependencies[$parent][] = $child;
+        $this->dependencies[$parent] = array_unique($this->dependencies[ $parent ], \SORT_STRING);
     }
     
     /**
@@ -85,15 +85,15 @@ class Provider
      * @param string $child
      * @return void
      */
-    public function removeDependency( $parent, $child )
+    public function removeDependency($parent, $child)
     {
-        if( isset( $this->dependencies[ $parent ] ) )
+        if(isset($this->dependencies[$parent]))
         {
-            $search = array_search( $child, $this->dependencies[ $parent ] );
+            $search = array_search($child, $this->dependencies[$parent]);
             
-            if( false !== $search )
+            if (false !== $search)
             {
-                unset( $this->dependencies[ $parent ][ $search ] );
+                unset($this->dependencies[$parent][$search]);
             }
         }
     }
@@ -112,9 +112,9 @@ class Provider
      * @param mixed $item
      * @return array|null An associative array of the parent/child mapping for an item
      */
-    public function getItemDependencies( $item )
+    public function getItemDependencies($item)
     {
-        return isset( $this->dependencies[ $item ] ) ? $this->dependencies[ $item ] : null;
+        return isset($this->dependencies[$item]) ? $this->dependencies[$item] : null;
     }
     
     /**
@@ -135,6 +135,4 @@ class Provider
     {
         $this->index = $index;
     }
-
-
 }
