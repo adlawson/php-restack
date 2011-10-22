@@ -2,38 +2,29 @@
 
 namespace Restack\Test\Queue;
 
-use Restack\Exception\InvalidItemException;
 use Restack\Queue\Weight;
+use Restack\Test\IndexTestCase;
 
-class WeightTest extends \PHPUnit_Framework_TestCase
+class WeightTest extends IndexTestCase
 {
-    /**
-     * The data storage
-     * @var Restack\Queue\Weight
-     */
-    public $queue;
-    
     /**
      * Setup the Queue
      * @return void
      */
     public function setUp()
     {
-        $this->queue = new Weight;
-        
-        $this->queue->insert('a');
-        $this->queue->insert('b');
-        $this->queue->insert('c', 0);
-        $this->queue->insert('d', 999);
+        $this->setIndex(new Weight);
+        parent::setUp();
     }
     
     /**
+     * Check the order from iterator output
      * @covers Restack\Queue\Weight::getIterator()
      */
     public function testIterator()
     {
         $items = array();
-        foreach ($this->queue as $item) {
+        foreach ($this->getIndex() as $item) {
             $items[] = $item;
         }
         
@@ -41,31 +32,30 @@ class WeightTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * Get weight on valid and invalid items
      * @covers Restack\Queue\Weight::getOrder()
      */
     public function testGetOrder()
     {
-        $this->assertSame($this->queue->getOrder('a'), Weight::DEFAULT_ORDER);
-        $this->assertSame($this->queue->getOrder('b'), Weight::DEFAULT_ORDER);
-        $this->assertSame($this->queue->getOrder('c'), 0);
-        $this->assertSame($this->queue->getOrder('d'), 999);
+        $this->assertSame($this->getIndex()->getOrder('a'), Weight::DEFAULT_ORDER);
+        $this->assertSame($this->getIndex()->getOrder('b'), Weight::DEFAULT_ORDER);
+        $this->assertSame($this->getIndex()->getOrder('c'), 0);
+        $this->assertSame($this->getIndex()->getOrder('d'), 999);
+        
+        $this->setExpectedException('Restack\Exception\InvalidItemException');
+        $this->getIndex()->getOrder('invalid_item');
     }
     
     /**
+     * Set weight on valid and invalid items
      * @covers Restack\Queue\Weight::setOrder()
      */
     public function testSetOrder()
     {
-        $this->queue->setOrder('c', 1337);
-        $this->assertSame($this->queue->getOrder('c'), 1337);
+        $this->getIndex()->setOrder('c', 1337);
+        $this->assertSame($this->getIndex()->getOrder('c'), 1337);
         
-        try {
-            $this->queue->setOrder('invalid_item', 666);
-        } catch (InvalidItemException $e) {
-            $this->assertTrue(true);
-            return;
-        }
-        
-        $this->fail('Exception Restack\Exception\InvalidItemException expected but not thrown');
+        $this->setExpectedException('Restack\Exception\InvalidItemException');
+        $this->getIndex()->setOrder('invalid_item', 666);
     }
 }
