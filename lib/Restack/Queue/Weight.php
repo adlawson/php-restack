@@ -16,17 +16,6 @@ namespace Restack\Queue;
 class Weight extends Priority
 {
     /**
-     * Add an element to the queue
-     * @param mixed $item
-     * @param integer $weight
-     * @return void
-     */
-    public function insert($item, $weight = self::DEFAULT_ORDER)
-    {
-        parent::insert($item, $weight);
-    }
-    
-    /**
      * Get the weight of an item
      * @param mixed $item
      * @return integer
@@ -37,14 +26,14 @@ class Weight extends Priority
     }
     
     /**
-     * Set the weight of an existing item
+     * Set the weight of an item
      * @param mixed $item
-     * @param integer $weight
+     * @param integer $order
      * @throws Restack\Exception\InvalidItemException
      * @return Restack\Queue\Weight
      */
-    public function setOrder($item, $weight)
+    public function setOrder($item, $order)
     {
-        return parent::setOrder($item, PHP_INT_MAX - (int) $weight);
+        return parent::setOrder($item, PHP_INT_MAX - (int) $order);
     }
 }

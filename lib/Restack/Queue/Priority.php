@@ -17,15 +17,15 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority extends Index
+class Priority extends Index implements Queue
 {
     const DEFAULT_ORDER = 1;
     
     /**
-     * Item index for normalising order
+     * Item base index for normalising order
      * @var integer
      */
-    private $index = PHP_INT_MAX;
+    private $base = PHP_INT_MAX;
     
     /**
      * Map an item to a given priority
@@ -47,7 +47,7 @@ class Priority extends Index
     {
         parent::clear();
         
-        $this->index = PHP_INT_MAX;
+        $this->base  = PHP_INT_MAX;
         $this->map   = array();
         $this->queue = null;
     }
@@ -107,17 +107,23 @@ class Priority extends Index
     public function getOrder($item)
     {
         $key = $this->search($item);
+        
+        if (false === $key)
+        {
+            throw new InvalidItemException('Item does not exist in storage');
+        }
+        
         return current($this->map[$key]);
     }
     
     /**
-     * Set the priority of an existing item
+     * Set the priority of an item
      * @param mixed $item
-     * @param integer $priority
+     * @param integer $order
      * @throws Restack\Exception\InvalidItemException
      * @return void
      */
-    public function setOrder($item, $priority)
+    public function setOrder($item, $order)
     {
         $key = $this->search($item);
         
@@ -126,7 +132,7 @@ class Priority extends Index
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        $this->map[$key] = array((int) $priority, $this->index--);
+        $this->map[$key] = array((int) $order, $this->base--);
     }
     
     /**
