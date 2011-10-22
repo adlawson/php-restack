@@ -17,7 +17,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack\Queue
  */
-class Priority extends Index implements Queue
+class Priority extends Index
 {
     const DEFAULT_ORDER = 1;
     
@@ -31,7 +31,7 @@ class Priority extends Index implements Queue
      * Map an item to a given priority
      * @var array
      */
-    private $map = array();
+    private $priorities = array();
     
     /**
      * The queue
@@ -48,7 +48,7 @@ class Priority extends Index implements Queue
         parent::clear();
         
         $this->base  = PHP_INT_MAX;
-        $this->map   = array();
+        $this->priorities = array();
         $this->queue = null;
     }
     
@@ -77,7 +77,7 @@ class Priority extends Index implements Queue
         
         if (false !== $key)
         {
-            unset($this->map[$key]);
+            unset($this->priorities[$key]);
         }
         
         parent::remove($item);
@@ -113,7 +113,7 @@ class Priority extends Index implements Queue
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        return current($this->map[$key]);
+        return current($this->priorities[$key]);
     }
     
     /**
@@ -132,7 +132,7 @@ class Priority extends Index implements Queue
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        $this->map[$key] = array((int) $order, $this->base--);
+        $this->priorities[$key] = array((int) $order, $this->base--);
     }
     
     /**
@@ -147,7 +147,7 @@ class Priority extends Index implements Queue
             
             foreach ($this->getItems() as $key => $item)
             {
-                $this->queue->insert($item, $this->map[$key]);
+                $this->queue->insert($item, $this->priorities[$key]);
             }
         }
         
