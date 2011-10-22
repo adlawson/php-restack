@@ -4,9 +4,10 @@ namespace Restack\Dependency;
 
 use Restack\Index;
 use Restack\Exception\CircularDependencyException;
+use Restack\Exception\InvalidItemException;
 
 /**
- * Dependency provider
+ * Dependency container
  * 
  * @category  Restack
  * @package   Restack\Dependency
@@ -14,16 +15,25 @@ use Restack\Exception\CircularDependencyException;
 class Provider
 {
     /**
-     * Item dependencies
+     * The index instance
+     * @var Restack\Index
+     */
+    private $index;
+    
+    /**
+     * Map of item dependent children
      * @var array
      */
     private $dependencies = array();
     
     /**
-     * The index instance
-     * @var Restack\Index
+     * Clear dependencies
+     * @return void
      */
-    private $index;
+    public function clear()
+    {
+        $this->dependencies = array();
+    }
     
     /**
      * Setup the dependency provider
@@ -36,85 +46,88 @@ class Provider
     }
     
     /**
-     * Sort the index based on a sorting algorithm and return the result
-     * 
-     * Re-order the index in a way that prioritises dependencies first
-     * This method is optimised via a result cache
-     * 
-     * @throws Restack\Exception\CircularDependencyException
-     * @return array
-     */
-    public function sort()
-    {
-        switch ($this->getIndex()->getState())
-        {                
-            case Index::STATE_UNSORTED:
-                Algorithm::pre($this);
-                Algorithm::run($this);
-                Algorithm::post($this);
-                
-            case Index::STATE_SORTED:
-                return $this->getIndex()->getItems();
-                
-            default:
-                $this->getIndex()->setState( Index::STATE_CORRUPT );
-                throw new CircularDependencyException('Index corrupted');
-        }
-    }
-    
-    /**
      * Add an item dependency
-     * @param string $parent
-     * @param string $child
+     * @param mixed $item
+     * @param mixed $parent
      * @return void
      */
-    public function addDependency($parent, $child)
+    public function addDependency($item, $parent)
     {
-        if (!isset($this->dependencies[$parent]))
+        $itemKey = $this->getIndex()->search($item);
+        if (false === $itemKey)
         {
-            $this->dependencies[$parent] = array();
+            throw new InvalidItemException('Child item does not exist in storage');
         }
         
-        $this->dependencies[$parent][] = $child;
-        $this->dependencies[$parent] = array_unique($this->dependencies[ $parent ], \SORT_STRING);
+        $parentKey = $this->getIndex()->search($parent);
+        if (false === $parentKey)
+        {
+            throw new InvalidItemException('Parent item does not exist in storage');
+        }
+        
+        if (!isset($this->dependencies[$itemKey]))
+        {
+            $this->dependencies[$itemKey] = array();
+        }
+        
+        $this->dependencies[$itemKey][] = $parentKey;
     }
     
     /**
      * Remove an item dependency
-     * @param string $parent
-     * @param string $child
+     * @param mixed $item
+     * @param mixed $parent
      * @return void
      */
-    public function removeDependency($parent, $child)
+    public function removeDependency($item, $parent)
     {
-        if(isset($this->dependencies[$parent]))
+        $itemKey = $this->getIndex()->search($item);
+        if (false === $itemKey)
         {
-            $search = array_search($child, $this->dependencies[$parent]);
-            
-            if (false !== $search)
-            {
-                unset($this->dependencies[$parent][$search]);
-            }
+            throw new InvalidItemException('Child item does not exist in storage');
+        }
+        
+        $parentKey = $this->getIndex()->search($parent);
+        if (false === $parentKey)
+        {
+            throw new InvalidItemException('Parent item does not exist in storage');
+        }
+        
+        $index = array_search($parentKey, $this->dependencies[$itemKey]);
+        if (false !== $index)
+        {
+            unset($this->dependencies[$itemKey][$index]);
         }
     }
     
     /**
-     * Get all registered item dependencies
-     * @return array An associative array of the parent/child mappings defined
-     */
-    public function getDependencies()
-    {
-        return $this->dependencies;
-    }
-    
-    /**
-     * Get registered dependencies for a specific item
+     * Get dependencies of an item
      * @param mixed $item
-     * @return array|null An associative array of the parent/child mapping for an item
+     * @return array
      */
     public function getItemDependencies($item)
     {
-        return isset($this->dependencies[$item]) ? $this->dependencies[$item] : null;
+        $itemKey = $this->getIndex()->search($item);
+        if (false === $itemKey)
+        {
+            throw new InvalidItemException('Child item does not exist in storage');
+        }
+        
+        $out = array();
+        
+        if (isset($this->dependencies[$itemKey]))
+        {
+            $items = &$this->getIndex()->getItems();
+            foreach($this->dependencies[$itemKey] as $parentKey)
+            {
+                if (isset($items[$parentKey]))
+                {
+                    $out[] = $items[$parentKey];
+                }
+            }
+        }
+        
+        return $out;
     }
     
     /**
@@ -128,11 +141,15 @@ class Provider
 
     /**
      * Set the index instance
+     * 
+     * All current dependencies will be cleared
+     * 
      * @param Restack\Index $index
      * @return void
      */
-    public function setIndex(Index $index)
+    public function setIndex($index)
     {
+        $this->clear();
         $this->index = $index;
     }
 }

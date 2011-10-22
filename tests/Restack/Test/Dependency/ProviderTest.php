@@ -2,122 +2,82 @@
 
 namespace Restack\Test\Dependency;
 
-use Restack\Index;
 use Restack\Queue\Priority;
 use Restack\Dependency\Provider;
 
 class ProviderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * The index instance
+     * @var Restack\Index
+     */
     private $provider;
     
+    /**
+     * Item instance 1
+     * @var stdClass
+     */
+    protected $obj1;
+    
+    /**
+     * Item instance 2
+     * @var stdClass
+     */
+    protected $obj2;
+    
+    /**
+     * Get the dependency provider instance
+     * @return Restack\Dependency\Provider
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
+    
+    /**
+     * Set the dependency provider instance
+     * @param Restack\Dependency\Provider $provider
+     * @return void
+     */
+    public function setProvider(Provider $provider)
+    {
+        $this->provider = $provider;
+    }
+    
+    /**
+     * Setup the dependency queue
+     * @return void
+     */
     public function setUp()
     {
-        $this->provider = new Provider(new Priority);
+        $this->setProvider(new Provider(new Priority));
+        
+        $this->getProvider()->getIndex()->insert('a');
+        $this->getProvider()->getIndex()->insert('b');
+        $this->getProvider()->getIndex()->insert('c');
+        $this->getProvider()->getIndex()->insert('d');
+        
+        $this->obj1 = new \stdClass;
+        $this->obj2 = new \stdClass;
+        
+        $this->getProvider()->getIndex()->insert($this->obj1);
+        $this->getProvider()->getIndex()->insert($this->obj2);
     }
     
-    public function testInsert()
+    /**
+     * Add item dependencies
+     * @covers Restack\Dependency\Provider::addDependency()
+     */
+    public function testAddDependency()
     {
-        $this->assertEquals( Index::STATE_SORTED, $this->provider->getIndex()->getState() );
+        $this->getProvider()->addDependency('a', 'b');
+        $this->getProvider()->addDependency('a', 'c');
+        $this->getProvider()->addDependency('b', 'c');
+        $this->getProvider()->addDependency($this->obj1, 'd');
+        $this->getProvider()->addDependency($this->obj1, $this->obj2);
         
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        
-        $this->assertEquals( Index::STATE_UNSORTED, $this->provider->getIndex()->getState() );
-        
-        $this->provider->sort();
-        
-        $this->assertEquals( Index::STATE_SORTED, $this->provider->getIndex()->getState() );
-        $this->assertEquals( 3, count( $this->provider->sort() ) );
-    }
-    
-    public function testBasicRetrieval()
-    {
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        
-        $this->provider->sort();
-        
-        $this->assertEquals( array( 'a', 'b', 'c' ), $this->provider->sort() );
-    }
-    
-    public function testDependencySetInNaturalOrder()
-    {
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        $this->provider->addDependency( 'c', 'a' );
-        
-        $this->assertEquals( array( 'a', 'b', 'c' ), $this->provider->sort() );
-    }
-    
-    public function testDependencySetOutOfNaturalOrder()
-    {
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        $this->provider->addDependency( 'a', 'b' );
-        
-        $this->assertEquals( array( 'b', 'a', 'c' ), $this->provider->sort() );
-    }
-    
-    public function testDependencyNesting()
-    {
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        $this->provider->addDependency( 'a', 'b' );
-        $this->provider->addDependency( 'b', 'c' );
-        
-        $this->assertEquals( array( 'c', 'b', 'a' ), $this->provider->sort() );
-    }
-    
-    public function testInvalidChildError()
-    {
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        $this->provider->addDependency( 'a', 'b' );
-        $this->provider->addDependency( 'b', 'c' );
-        $this->provider->addDependency( 'c', 'd' );
-
-        $this->setExpectedException( 'Restack\Exception\UnmetDependencyException' );
-        
-        $this->provider->sort();
-    }
-    
-    public function testDependencyRecuriveNestingError()
-    {
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        $this->provider->addDependency( 'a', 'b' );
-        $this->provider->addDependency( 'b', 'c' );
-        $this->provider->addDependency( 'c', 'a' );
-        
-        $this->setExpectedException( 'Restack\Exception\CircularDependencyException' );
-        
-        $this->provider->sort();
-    }
-    
-    public function testDependencyDeepNesting()
-    {
-        $this->provider->getIndex()->insert( 'a' );
-        $this->provider->getIndex()->insert( 'b' );
-        $this->provider->getIndex()->insert( 'c' );
-        $this->provider->getIndex()->insert( 'd' );
-        $this->provider->getIndex()->insert( 'e' );
-        $this->provider->getIndex()->insert( 'f' );
-        $this->provider->getIndex()->insert( 'g' );
-        $this->provider->getIndex()->insert( 'h' );
-        
-        $this->provider->addDependency( 'a', 'b' );
-        $this->provider->addDependency( 'b', 'c' );
-        $this->provider->addDependency( 'c', 'h' );
-        $this->provider->addDependency( 'h', 'g' );
-        $this->provider->addDependency( 'g', 'e' );
-        
-        $this->assertEquals( array( 'e', 'g', 'h', 'c', 'b', 'a', 'd', 'f' ), $this->provider->sort() );
+        $this->assertTrue($this->getProvider()->getItemDependencies('a') === array('b', 'c'));
+        $this->assertTrue($this->getProvider()->getItemDependencies('b') === array('c'));
+        $this->assertTrue($this->getProvider()->getItemDependencies($this->obj1) === array('d', $this->obj2));
     }
 }
