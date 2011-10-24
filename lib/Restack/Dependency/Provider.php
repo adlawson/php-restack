@@ -27,15 +27,6 @@ class Provider
     private $dependencies = array();
     
     /**
-     * Clear dependencies
-     * @return void
-     */
-    public function clear()
-    {
-        $this->dependencies = array();
-    }
-    
-    /**
      * Setup the dependency provider
      * @param Restack\Index $index
      * @return void
@@ -43,6 +34,15 @@ class Provider
     public function __construct(Index $index)
     {
         $this->setIndex($index);
+    }
+    
+    /**
+     * Clear dependencies
+     * @return void
+     */
+    public function clear()
+    {
+        $this->dependencies = array();
     }
     
     /**

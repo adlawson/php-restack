@@ -49,14 +49,27 @@ abstract class IndexTestCase extends \PHPUnit_Framework_TestCase
      */
     public function testInsert()
     {
+        $obj = new \stdClass;
+        
         $this->getIndex()->insert('1');
         $this->getIndex()->insert(1);
         $this->getIndex()->insert(7E-10);
         $this->getIndex()->insert(false);
         $this->getIndex()->insert(array('test' => 'array'));
-        $this->getIndex()->insert(new \stdClass());
+        $this->getIndex()->insert($obj);
         
-        $this->assertSame(10, $this->getIndex()->count());
+        $this->assertSame($this->getIndex()->getItems(), array(
+            'a',
+            'b',
+            'c',
+            'd',
+            '1',
+            1,
+            7E-10,
+            false,
+            array('test' => 'array'),
+            $obj
+        ));
     }
     
     /**
@@ -66,7 +79,11 @@ abstract class IndexTestCase extends \PHPUnit_Framework_TestCase
     public function testRemove()
     {
         $this->getIndex()->remove('a');
-        $this->assertSame(3, $this->getIndex()->count());
+        
+        $items = array('a', 'b', 'c', 'd');
+        unset($items[0]);
+        
+        $this->assertSame($this->getIndex()->getItems(), $items);
     }
     
     /**
