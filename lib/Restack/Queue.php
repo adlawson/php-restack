@@ -3,6 +3,25 @@
 namespace Restack;
 
 /**
+ * Proposed directory structure
+ * 
+ * Restack/
+ *     Dependency/
+ *         Provider.php
+ *     Exception/
+ *         CircularDependencyException.php
+ *         InvalidItemException.php
+ *     Priority/
+ *         PriorityInterface.php
+ *         Queue.php
+ *         Stack.php
+ *     Exception.php
+ *     Queue.php
+ *     Stack.php
+ *     StructureInterface.php
+ */
+
+/**
  * Notes:
  * Restack\Index could implement now with minor changes
  */
