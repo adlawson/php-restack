@@ -3,12 +3,12 @@
 namespace Restack\Dependency;
 
 /**
- * Dependable datastructure interface
+ * Trackable datastructure interface
  * 
  * @category  Restack
  * @package   Restack\Dependency
  */
-interface Sortable
+interface Trackable
 {
     /**
      * Search for an item in storage

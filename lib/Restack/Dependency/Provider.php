@@ -3,7 +3,7 @@
 namespace Restack\Dependency;
 
 use Restack\Index;
-use Restack\Dependency\Sortable;
+use Restack\Dependency\Trackable;
 use Restack\Exception\CircularDependencyException;
 use Restack\Exception\InvalidItemException;
 
@@ -29,10 +29,10 @@ class Provider
     
     /**
      * Setup the dependency provider
-     * @param Restack\Dependency\Sortable $index
+     * @param Restack\Dependency\Trackable $index
      * @return void
      */
-    public function __construct(Sortable $index)
+    public function __construct(Trackable $index)
     {
         $this->setIndex($index);
     }
@@ -66,12 +66,21 @@ class Provider
             throw new InvalidItemException('Parent item does not exist in storage');
         }
         
+        // Track item dependencies
         if (!isset($this->dependencies[$itemKey]))
         {
             $this->dependencies[$itemKey] = array();
         }
-        
         $this->dependencies[$itemKey][] = $parentKey;
+        
+        // Set the parent item position
+        $parentOrder = $this->getIndex()->getOrder($parent);
+        $itemOrder   = $this->getIndex()->getOrder($item);
+        
+        if ($parentOrder <= $itemOrder)
+        {
+            $this->getIndex()->setOrder($parent, $itemOrder + 1);
+        }
     }
     
     /**
@@ -133,7 +142,7 @@ class Provider
     
     /**
      * Get the index instance
-     * @return Restack\Index
+     * @return Restack\Dependency\Trackable
      */
     public function getIndex()
     {
@@ -145,10 +154,10 @@ class Provider
      * 
      * All current dependencies will be cleared
      * 
-     * @param Restack\Dependency\Sortable $index
+     * @param Restack\Dependency\Trackable $index
      * @return void
      */
-    public function setIndex(Sortable $index)
+    public function setIndex(Trackable $index)
     {
         $this->clear();
         $this->index = $index;

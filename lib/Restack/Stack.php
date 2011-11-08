@@ -2,7 +2,7 @@
 
 namespace Restack;
 
-use Restack\Dependency\Sortable;
+use Restack\Dependency\Trackable;
 use Restack\Exception\InvalidItemException;
 use SplPriorityQueue;
 
@@ -14,7 +14,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack
  */
-class Stack extends Index implements Sortable
+class Stack extends Index implements Trackable
 {
     const DEFAULT_ORDER = 1;
     
