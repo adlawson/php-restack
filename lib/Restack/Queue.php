@@ -1,23 +1,19 @@
 <?php
 
-namespace Restack\Queue;
+namespace Restack;
 
 use Restack\Exception\InvalidItemException;
-use Restack\Index;
 use SplPriorityQueue;
 
 /**
- * Priority ordered queue.
- * Items added to the queue are accessed in queue fashion,
- * meaning; first in, first out.
- * 
- * Items are ordered by priority, so an item with a high
- * priority will be placed nearer the top of the queue.
+ * Queued datastructure.
+ * Items added to the queue are accessed in FIFO
+ * order (First In, First Out)
  * 
  * @category  Restack
- * @package   Restack\Queue
+ * @package   Restack
  */
-class Priority extends Index
+class Queue extends Index
 {
     const DEFAULT_ORDER = 1;
     
@@ -34,7 +30,7 @@ class Priority extends Index
     private $priorities = array();
     
     /**
-     * The queue
+     * The queue instance
      * @var SplPriorityQueue
      */
     private $queue;
@@ -48,8 +44,8 @@ class Priority extends Index
         parent::clear();
         
         $this->base  = PHP_INT_MAX;
-        $this->priorities = array();
         $this->queue = null;
+        $this->priorities = array();
     }
     
     /**
@@ -85,17 +81,11 @@ class Priority extends Index
     
     /**
      * Get a cloned queue instance for iterating
-     * @param boolean $persist If false, iterated items will fall out of the queue
      * @return SplPriorityQueue
      */
-    public function getIterator($persist = true)
+    public function getIterator()
     {
-        if ($persist)
-        {
-            return clone $this->getQueue();
-        }
-        
-        return $this->getQueue();
+        return clone $this->getQueue();
     }
     
     /**
@@ -113,7 +103,7 @@ class Priority extends Index
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        return current($this->priorities[$key]);
+        return reset($this->priorities[$key]);
     }
     
     /**

@@ -6,12 +6,12 @@ use ArrayIterator;
 use Restack\Exception\InvalidItemException;
 
 /**
- * Basic item storage
+ * Simple item storage
  * 
  * @category  Restack
  * @package   Restack
  */
-abstract class Index implements \Countable, \IteratorAggregate
+class Index implements \Countable, \IteratorAggregate
 {
     const STATE_UNSORTED = 0;
     const STATE_SORTED   = 1;
