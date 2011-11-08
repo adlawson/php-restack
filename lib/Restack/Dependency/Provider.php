@@ -2,8 +2,6 @@
 
 namespace Restack\Dependency;
 
-use Restack\Index;
-use Restack\Dependency\Trackable;
 use Restack\Exception\CircularDependencyException;
 use Restack\Exception\InvalidItemException;
 
@@ -50,6 +48,8 @@ class Provider
      * Add an item dependency
      * @param mixed $item
      * @param mixed $parent
+     * @throws Restack\Exception\InvalidItemException
+     * @throws Restack\Exception\CircularDependencyException
      * @return void
      */
     public function addDependency($item, $parent)
@@ -66,12 +66,18 @@ class Provider
             throw new InvalidItemException('Parent item does not exist in storage');
         }
         
+        // Check for circular dependencies
+        if (isset($this->dependencies[$parentKey][$itemKey]))
+        {
+            throw new CircularDependencyException('Circular dependency detected');
+        }
+        
         // Track item dependencies
         if (!isset($this->dependencies[$itemKey]))
         {
             $this->dependencies[$itemKey] = array();
         }
-        $this->dependencies[$itemKey][] = $parentKey;
+        $this->dependencies[$itemKey][$parentKey] = $parentKey;
         
         // Set the parent item position
         $parentOrder = $this->getIndex()->getOrder($parent);
@@ -87,6 +93,7 @@ class Provider
      * Remove an item dependency
      * @param mixed $item
      * @param mixed $parent
+     * @throws Restack\Exception\InvalidItemException
      * @return void
      */
     public function removeDependency($item, $parent)
@@ -103,16 +110,16 @@ class Provider
             throw new InvalidItemException('Parent item does not exist in storage');
         }
         
-        $index = array_search($parentKey, $this->dependencies[$itemKey]);
-        if (false !== $index)
+        if (isset($this->dependencies[$itemKey][$parentKey]))
         {
-            unset($this->dependencies[$itemKey][$index]);
+            unset($this->dependencies[$itemKey][$parentKey]);
         }
     }
     
     /**
      * Get dependencies of an item
      * @param mixed $item
+     * @throws Restack\Exception\InvalidItemException
      * @return array
      */
     public function getItemDependencies($item)
@@ -151,9 +158,6 @@ class Provider
 
     /**
      * Set the index instance
-     * 
-     * All current dependencies will be cleared
-     * 
      * @param Restack\Dependency\Trackable $index
      * @return void
      */
