@@ -1,11 +1,10 @@
 <?php
 
-namespace Restack\Test\Queue;
+namespace Restack\Test;
 
-use Restack\Queue\Priority;
-use Restack\Test\IndexTestCase;
+use Restack\Queue;
 
-class PriorityTest extends IndexTestCase
+class QueueTest extends IndexTest
 {
     /**
      * Setup the queue
@@ -13,7 +12,7 @@ class PriorityTest extends IndexTestCase
      */
     public function setUp()
     {
-        $this->setIndex(new Priority);
+        $this->setIndex(new Queue);
         
         $this->getIndex()->insert('a');
         $this->getIndex()->insert('b');
@@ -23,7 +22,7 @@ class PriorityTest extends IndexTestCase
     
     /**
      * Check the order from iterator output
-     * @covers Restack\Queue\Priority::getIterator()
+     * @covers Restack\Queue::getIterator()
      */
     public function testIterator()
     {
@@ -38,12 +37,12 @@ class PriorityTest extends IndexTestCase
     
     /**
      * Get weight on valid and invalid items
-     * @covers Restack\Queue\Priority::getOrder()
+     * @covers Restack\Queue::getOrder()
      */
     public function testGetOrder()
     {
-        $this->assertSame($this->getIndex()->getOrder('a'), Priority::DEFAULT_ORDER);
-        $this->assertSame($this->getIndex()->getOrder('b'), Priority::DEFAULT_ORDER);
+        $this->assertSame($this->getIndex()->getOrder('a'), Queue::DEFAULT_ORDER);
+        $this->assertSame($this->getIndex()->getOrder('b'), Queue::DEFAULT_ORDER);
         $this->assertSame($this->getIndex()->getOrder('c'), 0);
         $this->assertSame($this->getIndex()->getOrder('d'), 999);
         
@@ -53,7 +52,7 @@ class PriorityTest extends IndexTestCase
     
     /**
      * Set weight on valid and invalid items
-     * @covers Restack\Queue\Priority::setOrder()
+     * @covers Restack\Queue::setOrder()
      */
     public function testSetOrder()
     {

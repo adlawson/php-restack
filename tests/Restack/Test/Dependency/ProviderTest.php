@@ -2,7 +2,7 @@
 
 namespace Restack\Test\Dependency;
 
-use Restack\Queue\Priority;
+use Restack\Queue;
 use Restack\Dependency\Provider;
 
 class ProviderTest extends \PHPUnit_Framework_TestCase
@@ -53,7 +53,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $this->obj1 = new \stdClass;
         $this->obj2 = new \stdClass;
         
-        $this->setProvider(new Provider(new Priority));
+        $this->setProvider(new Provider(new Queue));
         
         $this->getProvider()->getIndex()->insert('a');
         $this->getProvider()->getIndex()->insert('b');

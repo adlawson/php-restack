@@ -1,11 +1,10 @@
 <?php
 
-namespace Restack\Test\Queue;
+namespace Restack\Test;
 
-use Restack\Queue\Weight;
-use Restack\Test\IndexTestCase;
+use Restack\Stack;
 
-class WeightTest extends IndexTestCase
+class StackTest extends IndexTest
 {
     /**
      * Setup the Queue
@@ -13,7 +12,7 @@ class WeightTest extends IndexTestCase
      */
     public function setUp()
     {
-        $this->setIndex(new Weight);
+        $this->setIndex(new Stack);
         
         $this->getIndex()->insert('a');
         $this->getIndex()->insert('b');
@@ -23,7 +22,7 @@ class WeightTest extends IndexTestCase
     
     /**
      * Check the order from iterator output
-     * @covers Restack\Queue\Weight::getIterator()
+     * @covers Restack\Stack::getIterator()
      */
     public function testIterator()
     {
@@ -38,12 +37,12 @@ class WeightTest extends IndexTestCase
     
     /**
      * Get weight on valid and invalid items
-     * @covers Restack\Queue\Weight::getOrder()
+     * @covers Restack\Stack::getOrder()
      */
     public function testGetOrder()
     {
-        $this->assertSame($this->getIndex()->getOrder('a'), Weight::DEFAULT_ORDER);
-        $this->assertSame($this->getIndex()->getOrder('b'), Weight::DEFAULT_ORDER);
+        $this->assertSame($this->getIndex()->getOrder('a'), Stack::DEFAULT_ORDER);
+        $this->assertSame($this->getIndex()->getOrder('b'), Stack::DEFAULT_ORDER);
         $this->assertSame($this->getIndex()->getOrder('c'), 0);
         $this->assertSame($this->getIndex()->getOrder('d'), 999);
         
@@ -53,7 +52,7 @@ class WeightTest extends IndexTestCase
     
     /**
      * Set weight on valid and invalid items
-     * @covers Restack\Queue\Weight::setOrder()
+     * @covers Restack\Stack::setOrder()
      */
     public function testSetOrder()
     {
