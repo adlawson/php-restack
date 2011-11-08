@@ -11,10 +11,6 @@ namespace Restack;
  *     Exception/
  *         CircularDependencyException.php
  *         InvalidItemException.php
- *     Priority/
- *         PriorityInterface.php
- *         Queue.php
- *         Stack.php
  *     Exception.php
  *     Queue.php
  *     Stack.php
