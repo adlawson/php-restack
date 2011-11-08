@@ -2,6 +2,7 @@
 
 namespace Restack;
 
+use Restack\Dependency\Sortable;
 use Restack\Exception\InvalidItemException;
 use SplPriorityQueue;
 
@@ -13,7 +14,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack
  */
-class Queue extends Index
+class Queue extends Index implements Sortable
 {
     const DEFAULT_ORDER = 1;
     
@@ -24,10 +25,10 @@ class Queue extends Index
     private $base = PHP_INT_MAX;
     
     /**
-     * Map an item to a given priority
+     * Map an item to a given position
      * @var array
      */
-    private $priorities = array();
+    private $order = array();
     
     /**
      * The queue instance
@@ -44,8 +45,8 @@ class Queue extends Index
         parent::clear();
         
         $this->base  = PHP_INT_MAX;
+        $this->order = array();
         $this->queue = null;
-        $this->priorities = array();
     }
     
     /**
@@ -73,7 +74,7 @@ class Queue extends Index
         
         if (false !== $key)
         {
-            unset($this->priorities[$key]);
+            unset($this->order[$key]);
         }
         
         parent::remove($item);
@@ -103,7 +104,7 @@ class Queue extends Index
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        return reset($this->priorities[$key]);
+        return reset($this->order[$key]);
     }
     
     /**
@@ -122,7 +123,7 @@ class Queue extends Index
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        $this->priorities[$key] = array((int) $order, $this->base--);
+        $this->order[$key] = array((int) $order, $this->base--);
     }
     
     /**
@@ -137,7 +138,7 @@ class Queue extends Index
             
             foreach ($this->getItems() as $key => $item)
             {
-                $this->queue->insert($item, $this->priorities[$key]);
+                $this->queue->insert($item, $this->order[$key]);
             }
         }
         

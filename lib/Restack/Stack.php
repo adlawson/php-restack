@@ -2,6 +2,7 @@
 
 namespace Restack;
 
+use Restack\Dependency\Sortable;
 use Restack\Exception\InvalidItemException;
 use SplPriorityQueue;
 
@@ -13,7 +14,7 @@ use SplPriorityQueue;
  * @category  Restack
  * @package   Restack
  */
-class Stack extends Index
+class Stack extends Index implements Sortable
 {
     const DEFAULT_ORDER = 1;
     
@@ -24,10 +25,10 @@ class Stack extends Index
     private $base = PHP_INT_MAX;
     
     /**
-     * Map an item to a given priority
+     * Map an item to a given position
      * @var array
      */
-    private $priorities = array();
+    private $order = array();
     
     /**
      * The stack instance
@@ -44,8 +45,8 @@ class Stack extends Index
         parent::clear();
         
         $this->base  = PHP_INT_MAX;
+        $this->order = array();
         $this->stack = null;
-        $this->priorities = array();
     }
     
     /**
@@ -73,7 +74,7 @@ class Stack extends Index
         
         if (false !== $key)
         {
-            unset($this->priorities[$key]);
+            unset($this->order[$key]);
         }
         
         parent::remove($item);
@@ -103,7 +104,7 @@ class Stack extends Index
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        return PHP_INT_MAX - reset($this->priorities[$key]);
+        return PHP_INT_MAX - reset($this->order[$key]);
     }
     
     /**
@@ -122,7 +123,7 @@ class Stack extends Index
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        $this->priorities[$key] = array((PHP_INT_MAX - (int) $order), $this->base--);
+        $this->order[$key] = array((PHP_INT_MAX - (int) $order), $this->base--);
     }
     
     /**
@@ -137,7 +138,7 @@ class Stack extends Index
             
             foreach ($this->getItems() as $key => $item)
             {
-                $this->stack->insert($item, $this->priorities[$key]);
+                $this->stack->insert($item, $this->order[$key]);
             }
         }
         

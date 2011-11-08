@@ -21,7 +21,7 @@ class Index implements \Countable, \IteratorAggregate
      * Stored items
      * @var array 
      */
-    private $items = array();  
+    private $items = array();
     
     /**
      * The index state

@@ -3,6 +3,7 @@
 namespace Restack\Dependency;
 
 use Restack\Index;
+use Restack\Dependency\Sortable;
 use Restack\Exception\CircularDependencyException;
 use Restack\Exception\InvalidItemException;
 
@@ -28,10 +29,10 @@ class Provider
     
     /**
      * Setup the dependency provider
-     * @param Restack\Index $index
+     * @param Restack\Dependency\Sortable $index
      * @return void
      */
-    public function __construct(Index $index)
+    public function __construct(Sortable $index)
     {
         $this->setIndex($index);
     }
@@ -144,10 +145,10 @@ class Provider
      * 
      * All current dependencies will be cleared
      * 
-     * @param Restack\Index $index
+     * @param Restack\Dependency\Sortable $index
      * @return void
      */
-    public function setIndex($index)
+    public function setIndex(Sortable $index)
     {
         $this->clear();
         $this->index = $index;
