@@ -132,7 +132,7 @@ class Stack extends Index implements Sortable
      */
     public function getStack()
     {
-        if (self::STATE_UNSORTED === $this->getState())
+        if (self::STATE_DIRTY === $this->getState())
         {
             $this->stack = new SplPriorityQueue;
             

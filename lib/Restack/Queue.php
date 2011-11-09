@@ -132,7 +132,7 @@ class Queue extends Index implements Sortable
      */
     public function getQueue()
     {
-        if (self::STATE_UNSORTED === $this->getState())
+        if (self::STATE_DIRTY === $this->getState())
         {
             $this->queue = new SplPriorityQueue;
             

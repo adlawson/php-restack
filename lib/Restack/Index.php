@@ -13,9 +13,9 @@ use Restack\Exception\InvalidItemException;
  */
 class Index implements \Countable, \IteratorAggregate
 {
-    const STATE_UNSORTED = 0;
-    const STATE_SORTED   = 1;
-    const STATE_CORRUPT  = 2;
+    const STATE_CLEAN   = 0;
+    const STATE_DIRTY   = 1;
+    const STATE_CORRUPT = 2;
     
     /**
      * Stored items
@@ -27,7 +27,7 @@ class Index implements \Countable, \IteratorAggregate
      * The index state
      * @var integer
      */
-    private $state = self::STATE_SORTED;
+    private $state = self::STATE_CLEAN;
     
     /**
      * Clear storage
@@ -36,6 +36,7 @@ class Index implements \Countable, \IteratorAggregate
     public function clear()
     {
         $this->items = array();
+        $this->setState(self::STATE_CLEAN);
     }
     
     /**
@@ -69,7 +70,7 @@ class Index implements \Countable, \IteratorAggregate
             throw new InvalidItemException('Item already exists in storage');
         }
         
-        $this->setState(self::STATE_UNSORTED);
+        $this->setState(self::STATE_DIRTY);
         $this->items[] = $item;
     }
     
@@ -87,7 +88,7 @@ class Index implements \Countable, \IteratorAggregate
             throw new InvalidItemException('Item does not exist in storage');
         }
         
-        $this->setState(self::STATE_UNSORTED);
+        $this->setState(self::STATE_DIRTY);
         unset($this->items[$key]);
     }
     
@@ -124,7 +125,7 @@ class Index implements \Countable, \IteratorAggregate
             $this->insert($item);
         }
         
-        $this->setState(self::STATE_SORTED);
+        $this->setState(self::STATE_CLEAN);
     }
     
     /**
