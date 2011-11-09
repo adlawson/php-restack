@@ -1,28 +1,15 @@
 <?php
 
-namespace Restack\Dependency;
+namespace Restack\Structure;
 
 /**
- * Trackable datastructure interface
+ * Sortable datastructure interface
  * 
  * @category  Restack
- * @package   Restack\Dependency
+ * @package   Restack\Structure
  */
-interface Trackable
+interface Sortable
 {
-    /**
-     * Search for an item in storage
-     * @param mixed $item
-     * @return integer|false Item key or false if not found
-     */
-    public function search($item);
-    
-    /**
-     * Get the item index
-     * @return array
-     */
-    public function getItems();
-    
     /**
      * Get the priority of an item
      * @param mixed $item
